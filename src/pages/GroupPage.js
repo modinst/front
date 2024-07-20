@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import GroupRequestModal from "../components/GroupRequestModal";
 import GroupCreateModal from "../components/GroupCreateModal";
 
-const GroupPage = () => {
-  const defaultGroupImage = "경로"; // 기본 이미지 경로 설정
+const GroupPage = ({ onGroupClick }) => {
+  const defaultGroupImage = "path/to/default/image.png"; // 기본 이미지 경로 설정
   const [groups, setGroups] = useState([
     {
       id: 1,
@@ -60,7 +60,11 @@ const GroupPage = () => {
       </button>
       <div className="grid grid-cols-3 gap-4">
         {groups.map((group) => (
-          <div key={group.id} className="bg-white rounded-lg shadow-md p-4">
+          <div
+            key={group.id}
+            className="bg-white rounded-lg shadow-md p-4 cursor-pointer"
+            onClick={() => onGroupClick(group)}
+          >
             <img
               src={group.image}
               alt="Group"
@@ -70,7 +74,10 @@ const GroupPage = () => {
             <p className="text-gray-600 mb-4">{group.description}</p>
             <button
               className="bg-gray-200 text-gray-700 px-4 py-2 rounded"
-              onClick={() => handleRequestJoinClick(group)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRequestJoinClick(group);
+              }}
             >
               Request Join
             </button>
