@@ -1,9 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const GroupCreateModal = ({ isOpen, onClose, onCreate }) => {
   const [groupName, setGroupName] = useState("");
   const [description, setDescription] = useState("");
   const [groupPicture, setGroupPicture] = useState(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setGroupName("");
+      setDescription("");
+      setGroupPicture(null);
+    }
+  }, [isOpen]);
 
   const handleGroupPictureChange = (event) => {
     const file = event.target.files[0];
