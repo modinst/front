@@ -1,11 +1,12 @@
-// src/pages/MainPage.js
 import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import MyPage from "./MyPage";
 import GroupPage from "./GroupPage";
+import GroupRecordsPage from "./GroupRecordsPage";
 
 const MainPage = () => {
   const [activePage, setActivePage] = useState("mypage");
+  const [selectedGroup, setSelectedGroup] = useState(null);
 
   const renderPage = () => {
     switch (activePage) {
@@ -14,7 +15,16 @@ const MainPage = () => {
       case "home":
         return <h1 className="text-2xl font-bold">Home Page</h1>;
       case "groups":
-        return <GroupPage />;
+        return (
+          <GroupPage
+            onGroupClick={(group) => {
+              setSelectedGroup(group);
+              setActivePage("groupRecords");
+            }}
+          />
+        );
+      case "groupRecords":
+        return <GroupRecordsPage group={selectedGroup} />;
       case "settings":
         return <h1 className="text-2xl font-bold">Settings Page</h1>;
       default:

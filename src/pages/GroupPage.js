@@ -1,9 +1,10 @@
-// src/pages/GroupPage.js
 import React, { useState } from "react";
 import GroupRequestModal from "../components/GroupRequestModal";
+import GroupCreateModal from "../components/GroupCreateModal";
 
-const GroupPage = () => {
-  const groups = [
+const GroupPage = ({ onGroupClick }) => {
+  const defaultGroupImage = "path/to/default/image.png"; // 기본 이미지 경로 설정
+  const [groups, setGroups] = useState([
     {
       id: 1,
       name: "Jason's Group",
@@ -25,26 +26,45 @@ const GroupPage = () => {
       image: "image-3.png",
       members: ["name9", "name10", "name11", "name12"],
     },
-    // 더 많은 그룹을 추가할 수 있습니다.
-  ];
+  ]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
 
   const handleRequestJoinClick = (group) => {
     setSelectedGroup(group);
-    setIsModalOpen(true);
+    setIsRequestModalOpen(true);
+  };
+
+  const handleCreateGroup = (newGroup) => {
+    const newGroupId = groups.length + 1;
+    const groupWithId = {
+      id: newGroupId,
+      name: newGroup.groupName,
+      description: newGroup.description,
+      image: newGroup.groupPicture || defaultGroupImage,
+      members: [],
+    };
+    setGroups([...groups, groupWithId]);
   };
 
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Join Groups</h1>
-      <button className="bg-blue-500 text-white px-4 py-2 rounded mb-4">
+      <button
+        className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
+        onClick={() => setIsCreateModalOpen(true)}
+      >
         + Add New Group
       </button>
       <div className="grid grid-cols-3 gap-4">
         {groups.map((group) => (
-          <div key={group.id} className="bg-white rounded-lg shadow-md p-4">
+          <div
+            key={group.id}
+            className="bg-white rounded-lg shadow-md p-4 cursor-pointer"
+            onClick={() => onGroupClick(group)}
+          >
             <img
               src={group.image}
               alt="Group"
@@ -54,7 +74,10 @@ const GroupPage = () => {
             <p className="text-gray-600 mb-4">{group.description}</p>
             <button
               className="bg-gray-200 text-gray-700 px-4 py-2 rounded"
-              onClick={() => handleRequestJoinClick(group)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRequestJoinClick(group);
+              }}
             >
               Request Join
             </button>
@@ -63,11 +86,16 @@ const GroupPage = () => {
       </div>
       {selectedGroup && (
         <GroupRequestModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={isRequestModalOpen}
+          onClose={() => setIsRequestModalOpen(false)}
           group={selectedGroup}
         />
       )}
+      <GroupCreateModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreate={handleCreateGroup}
+      />
     </div>
   );
 };
