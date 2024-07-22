@@ -1,36 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import GroupRequestModal from "../components/GroupRequestModal";
 import GroupCreateModal from "../components/GroupCreateModal";
+import axios from 'axios';
 
 const GroupPage = ({ onGroupClick }) => {
   const defaultGroupImage = "path/to/default/image.png"; // 기본 이미지 경로 설정
-  const [groups, setGroups] = useState([
-    {
-      id: 1,
-      name: "Jason's Group",
-      description: "description~~...",
-      image: "image.png",
-      members: ["name1", "name2", "name3", "name4"],
-    },
-    {
-      id: 2,
-      name: "Duane Dean",
-      description: "description~~...",
-      image: "image-2.png",
-      members: ["name5", "name6", "name7", "name8"],
-    },
-    {
-      id: 3,
-      name: "Jonathan Barker",
-      description: "description~~...",
-      image: "image-3.png",
-      members: ["name9", "name10", "name11", "name12"],
-    },
-  ]);
-
+  const [groups, setGroups] = useState([]);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
+
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const response = await axios.get('http://172.10.7.103/api/groups');
+        setGroups(response.data);
+      } catch (error) {
+        console.error("Error fetching groups:", error);
+      }
+    };
+
+    fetchGroups();
+  }, []);
 
   const handleRequestJoinClick = (group) => {
     setSelectedGroup(group);
@@ -61,12 +52,12 @@ const GroupPage = ({ onGroupClick }) => {
       <div className="grid grid-cols-3 gap-4">
         {groups.map((group) => (
           <div
-            key={group.id}
+            key={group._id}
             className="bg-white rounded-lg shadow-md p-4 cursor-pointer"
             onClick={() => onGroupClick(group)}
           >
             <img
-              src={group.image}
+              src={group.image || defaultGroupImage}
               alt="Group"
               className="w-full h-40 object-cover mb-4 rounded"
             />

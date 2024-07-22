@@ -1,41 +1,32 @@
-// src/pages/MyPage.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Track from "../components/Track";
 import SelectModal from "../components/SelectModal";
 import MetronomeModal from "../components/MetronomeModal";
 import SaveModal from "../components/SaveModal";
 
 const MyPage = () => {
-  const [tracks, setTracks] = useState([
-    {
-      id: 1,
-      title: "My new Guitar Track #1",
-      bpm: "90 BPM",
-      duration: "3:11",
-      icon: "/path/to/guitar-icon.png",
-    },
-    {
-      id: 2,
-      title: "My new Drum Track #1",
-      bpm: "105 BPM",
-      duration: "2:01",
-      icon: "/path/to/drum-icon.png",
-    },
-    {
-      id: 3,
-      title: "My new Guitar Track #2",
-      bpm: "90 BPM",
-      duration: "3:31",
-      icon: "/path/to/guitar-icon.png",
-    },
-  ]);
-
+  const [tracks, setTracks] = useState([]);
   const [isSelectModalOpen, setIsSelectModalOpen] = useState(false);
   const [isMetronomeModalOpen, setIsMetronomeModalOpen] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [selectedInstrument, setSelectedInstrument] = useState("");
   const [selectedBpm, setSelectedBpm] = useState("90");
   const [recordDuration, setRecordDuration] = useState("1:31"); // 임시 녹음 시간
+  const userId = "your-user-id"; // 실제 사용자 ID를 설정하세요
+
+  useEffect(() => {
+    const fetchTracks = async () => {
+      try {
+        const response = await axios.get(`http://172.10.7.103/api/users/${userId}/tracks`);
+        setTracks(response.data);
+      } catch (error) {
+        console.error("Error fetching tracks:", error);
+      }
+    };
+
+    fetchTracks();
+  }, [userId]);
 
   const handleSelectModalSubmit = () => {
     setIsSelectModalOpen(false);
@@ -48,19 +39,20 @@ const MyPage = () => {
     setIsSaveModalOpen(true);
   };
 
-  const handleSave = (track) => {
-    console.log("Track before saving:", track); // 로그 추가
-    setTracks([
-      ...tracks,
-      {
-        id: tracks.length + 1,
+  const handleSave = async (track) => {
+    try {
+      const newTrack = {
         title: track.projectName,
         bpm: `${track.bpm} BPM`,
         duration: track.duration,
         icon: `/path/to/${track.instrument.toLowerCase()}-icon.png`,
-      },
-    ]);
-    setIsSaveModalOpen(false);
+      };
+      const response = await axios.post(`http://172.10.7.103/api/users/${userId}/tracks`, newTrack);
+      setTracks([...tracks, response.data]);
+      setIsSaveModalOpen(false);
+    } catch (error) {
+      console.error("Error saving track:", error);
+    }
   };
 
   return (

@@ -1,5 +1,5 @@
-// src/components/GroupRequestModal.js
 import React, { useState } from "react";
+import axios from "axios";
 
 const GroupRequestModal = ({ isOpen, onClose, group }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -10,10 +10,10 @@ const GroupRequestModal = ({ isOpen, onClose, group }) => {
     setError(null);
 
     try {
-      // 서버 요청 로직은 나중에 추가
-      // 예: const response = await fetch('/api/groups/join', {...});
-      console.log("Request join for group:", group.id);
-      alert("Join request simulated!");
+      const userId = "your-user-id"; // TODO: 실제 사용자 ID를 여기에 설정
+      const response = await axios.post(`http://172.10.7.103/api/groups/${group.id}/join-requests`, { user_id: userId });
+      console.log("Request join response:", response.data);
+      alert("Join request sent!");
       onClose();
     } catch (err) {
       setError("Failed to send join request");
