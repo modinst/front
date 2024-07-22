@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import GroupRequestModal from "../components/GroupRequestModal";
 import GroupCreateModal from "../components/GroupCreateModal";
 
 const GroupPage = ({ onGroupClick }) => {
+  const history = useHistory();
   const defaultGroupImage = "path/to/default/image.png"; // 기본 이미지 경로 설정
   const [groups, setGroups] = useState([
     {
@@ -49,6 +51,14 @@ const GroupPage = ({ onGroupClick }) => {
     setGroups([...groups, groupWithId]);
   };
 
+  const handleGroupClick = (group) => {
+    if (onGroupClick) {
+      onGroupClick(group);
+    } else {
+      history.push(`/group/${group.id}`);
+    }
+  };
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Join Groups</h1>
@@ -63,7 +73,7 @@ const GroupPage = ({ onGroupClick }) => {
           <div
             key={group.id}
             className="bg-white rounded-lg shadow-md p-4 cursor-pointer"
-            onClick={() => onGroupClick(group)}
+            onClick={() => handleGroupClick(group)}
           >
             <img
               src={group.image}
