@@ -1,41 +1,48 @@
-// src/pages/MyPage.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Track from "../components/Track";
 import SelectModal from "../components/SelectModal";
 import MetronomeModal from "../components/MetronomeModal";
 import SaveModal from "../components/SaveModal";
 
 const MyPage = () => {
-  const [tracks, setTracks] = useState([
-    {
-      id: 1,
-      title: "My new Guitar Track #1",
-      bpm: "90 BPM",
-      duration: "3:11",
-      icon: "/path/to/guitar-icon.png",
-    },
-    {
-      id: 2,
-      title: "My new Drum Track #1",
-      bpm: "105 BPM",
-      duration: "2:01",
-      icon: "/path/to/drum-icon.png",
-    },
-    {
-      id: 3,
-      title: "My new Guitar Track #2",
-      bpm: "90 BPM",
-      duration: "3:31",
-      icon: "/path/to/guitar-icon.png",
-    },
-  ]);
-
+  const [tracks, setTracks] = useState([]);
   const [isSelectModalOpen, setIsSelectModalOpen] = useState(false);
   const [isMetronomeModalOpen, setIsMetronomeModalOpen] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [selectedInstrument, setSelectedInstrument] = useState("");
   const [selectedBpm, setSelectedBpm] = useState("90");
-  const [recordDuration, setRecordDuration] = useState("1:31"); // 임시 녹음 시간
+  const [recordDuration, setRecordDuration] = useState("1:31");
+
+  useEffect(() => {
+    const fetchTracks = async () => {
+      const fetchedTracks = [
+        {
+          id: 1,
+          title: "My new Guitar Track #1",
+          bpm: "90 BPM",
+          duration: "3:11",
+          icon: "/path/to/guitar-icon.png",
+        },
+        {
+          id: 2,
+          title: "My new Drum Track #1",
+          bpm: "105 BPM",
+          duration: "2:01",
+          icon: "/path/to/drum-icon.png",
+        },
+        {
+          id: 3,
+          title: "My new Guitar Track #2",
+          bpm: "90 BPM",
+          duration: "3:31",
+          icon: "/path/to/guitar-icon.png",
+        },
+      ];
+      setTracks(fetchedTracks);
+    };
+
+    fetchTracks();
+  }, []);
 
   const handleSelectModalSubmit = () => {
     setIsSelectModalOpen(false);
@@ -44,12 +51,11 @@ const MyPage = () => {
 
   const handleRecordComplete = () => {
     setIsMetronomeModalOpen(false);
-    setRecordDuration("1:31"); // 예제 녹음 시간
+    setRecordDuration("1:31");
     setIsSaveModalOpen(true);
   };
 
   const handleSave = (track) => {
-    console.log("Track before saving:", track); // 로그 추가
     setTracks([
       ...tracks,
       {

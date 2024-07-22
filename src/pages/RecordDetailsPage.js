@@ -1,20 +1,29 @@
-import React from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 
-const RecordDetailsPage = () => {
-  const { recordId } = useParams();
+const RecordDetailsPage = ({ recordId }) => {
+  const [record, setRecord] = useState(null);
 
-  // 예시 데이터
-  const record = {
-    id: recordId,
-    name: `Record #${recordId}`,
-    bpm: 90,
-    tracks: [
-      { id: 1, title: "Guitar Track #1", artist: "name1" },
-      { id: 2, title: "Drum Track #1", artist: "name2" },
-      { id: 3, title: "Bass Track #1", artist: "name3" },
-    ],
-  };
+  useEffect(() => {
+    const fetchRecordData = async () => {
+      const recordData = {
+        id: recordId,
+        name: `Record #${recordId}`,
+        bpm: 90,
+        tracks: [
+          { id: 1, title: "Guitar Track #1", artist: "name1" },
+          { id: 2, title: "Drum Track #1", artist: "name2" },
+          { id: 3, title: "Bass Track #1", artist: "name3" },
+        ],
+      };
+      setRecord(recordData);
+    };
+
+    fetchRecordData();
+  }, [recordId]);
+
+  if (!record) {
+    return <h1 className="text-2xl font-bold">Loading...</h1>;
+  }
 
   return (
     <div className="p-4">

@@ -3,10 +3,12 @@ import Sidebar from "../components/Sidebar";
 import MyPage from "./MyPage";
 import GroupPage from "./GroupPage";
 import GroupRecordsPage from "./GroupRecordsPage";
+import RecordDetailsPage from "./RecordDetailsPage";
 
 const MainPage = () => {
-  const [activePage, setActivePage] = useState("mypage");
+  const [activePage, setActivePage] = useState("home");
   const [selectedGroup, setSelectedGroup] = useState(null);
+  const [selectedRecordId, setSelectedRecordId] = useState(null);
 
   const renderPage = () => {
     switch (activePage) {
@@ -24,7 +26,23 @@ const MainPage = () => {
           />
         );
       case "groupRecords":
-        return <GroupRecordsPage group={selectedGroup} />;
+        return selectedGroup ? (
+          <GroupRecordsPage
+            group={selectedGroup}
+            onRecordClick={(recordId) => {
+              setSelectedRecordId(recordId);
+              setActivePage("recordDetails");
+            }}
+          />
+        ) : (
+          <h1 className="text-2xl font-bold">No Group Selected</h1>
+        );
+      case "recordDetails":
+        return selectedRecordId ? (
+          <RecordDetailsPage recordId={selectedRecordId} />
+        ) : (
+          <h1 className="text-2xl font-bold">No Record Selected</h1>
+        );
       case "settings":
         return <h1 className="text-2xl font-bold">Settings Page</h1>;
       default:

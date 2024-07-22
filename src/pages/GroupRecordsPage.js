@@ -1,25 +1,21 @@
-import React from "react";
-import { useParams, useHistory } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 
-const GroupRecordsPage = () => {
-  const { groupId } = useParams();
-  const history = useHistory();
-  const records = [
-    { id: 1, name: "Record #1", bpm: 90 },
-    { id: 2, name: "Record #2", bpm: 90 },
-    { id: 3, name: "Record #3", bpm: 90 },
-    { id: 4, name: "Record #4", bpm: 90 },
-  ];
+const GroupRecordsPage = ({ group, onRecordClick }) => {
+  const [records, setRecords] = useState([]);
 
-  // 예시로 그룹 정보를 설정합니다. 실제로는 API 호출 등을 통해 데이터를 가져옵니다.
-  const group = {
-    id: groupId,
-    name: "Jason's Group",
-  };
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      const recordData = [
+        { id: 1, name: "Record #1", bpm: 90 },
+        { id: 2, name: "Record #2", bpm: 90 },
+        { id: 3, name: "Record #3", bpm: 90 },
+        { id: 4, name: "Record #4", bpm: 90 },
+      ];
+      setRecords(recordData);
+    };
 
-  const handleRecordClick = (recordId) => {
-    history.push(`/record/${recordId}`);
-  };
+    fetchGroupData();
+  }, [group.id]);
 
   return (
     <div className="p-4">
@@ -32,7 +28,7 @@ const GroupRecordsPage = () => {
           <div
             key={record.id}
             className="bg-white rounded-lg shadow-md p-4 flex justify-between items-center cursor-pointer"
-            onClick={() => handleRecordClick(record.id)}
+            onClick={() => onRecordClick(record.id)}
           >
             <div>{record.name}</div>
             <div>{record.bpm} BPM</div>
