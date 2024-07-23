@@ -105,7 +105,15 @@ const RecordDetailsPage = ({ userId }) => {
   };
 
   const handleSave = (track) => {
-    const savedTrack = saveTrackToLocalStorage(track);
+    const newTrack = {
+      id: new Date().getTime(),
+      title: track.projectName,
+      bpm: `${track.bpm} BPM`,
+      duration: track.duration,
+      icon: `/path/to/${track.instrument.toLowerCase()}-icon.png`,
+      instrument: track.instrument,
+    };
+    const savedTrack = saveTrackToLocalStorage(newTrack);
     const updatedTempTracks = [...tempTracks, savedTrack];
     setTempTracks(updatedTempTracks);
     setIsSaveModalOpen(false);
@@ -114,12 +122,12 @@ const RecordDetailsPage = ({ userId }) => {
   const handleUploadTrack = (track) => {
     const updatedRecordTracks = [...record.tracks, track];
     setRecord({ ...record, tracks: updatedRecordTracks });
-    const updatedTempTracks = tempTracks.filter((t) => t !== track);
+    const updatedTempTracks = tempTracks.filter((t) => t.id !== track.id);
     setTempTracks(updatedTempTracks);
   };
 
   const handleRemoveTempTrack = (track) => {
-    const updatedTempTracks = tempTracks.filter((t) => t !== track);
+    const updatedTempTracks = tempTracks.filter((t) => t.id !== track.id);
     setTempTracks(updatedTempTracks);
   };
 
@@ -224,13 +232,13 @@ const RecordDetailsPage = ({ userId }) => {
         <div className="fixed bottom-8 left-8 p-4 bg-white rounded-lg shadow-lg max-w-md w-full z-50">
           <h3 className="text-xl font-bold mb-4">Temporary Tracks</h3>
           <div className="space-y-2">
-            {tempTracks.map((track, index) => (
+            {tempTracks.map((track) => (
               <div
-                key={index}
-                className="bg-gray-100 rounded-lg shadow-md p-2 flex justify-between items-center"
+                key={track.id}
+                className="bg-gray-100 p-2 rounded-lg flex justify-between items-center"
               >
                 <div>
-                  <div className="font-semibold">{track.title}</div>
+                  <div className="text-lg font-semibold">{track.title}</div>
                   <div className="text-sm text-gray-500">
                     {track.instrument} - {track.bpm} BPM - {track.duration}
                   </div>
