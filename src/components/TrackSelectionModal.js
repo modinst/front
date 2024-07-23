@@ -6,6 +6,7 @@ const TrackSelectionModal = ({
   onClose,
   tracks,
   onRecordYourSection,
+  onAddNewTrack,
 }) => {
   if (!isOpen) return null;
 
@@ -27,7 +28,7 @@ const TrackSelectionModal = ({
         </div>
         <div className="flex justify-between mt-8">
           <button
-            onClick={() => onRecordYourSection(null, null)}
+            onClick={onAddNewTrack}
             className="bg-blue-500 text-white px-4 py-2 rounded"
           >
             Add New Track

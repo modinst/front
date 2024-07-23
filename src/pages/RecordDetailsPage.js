@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import TrackSelectionModal from "../components/TrackSelectionModal";
+import SelectModal from "../components/SelectModal";
 import MetronomeModal from "../components/MetronomeModal";
 import SaveModal from "../components/SaveModal";
-import SelectModal from "../components/SelectModal";
 
 const RecordPage = () => {
   const [record, setRecord] = useState(null);
@@ -70,20 +70,16 @@ const RecordPage = () => {
     setIsTrackModalOpen(false);
   };
 
-  const handleRecordYourSection = (track) => {
-    setSelectedInstrument(track.instrument);
-    setSelectedBpm(record.bpm);
-    setIsMetronomeModalOpen(true);
+  const handleRecordYourSection = (instrument, bpm) => {
+    setSelectedInstrument(instrument);
+    setSelectedBpm(bpm);
     setIsTrackModalOpen(false);
+    setIsMetronomeModalOpen(true);
   };
 
   const handleAddNewTrack = () => {
-    setIsSelectModalOpen(true);
     setIsTrackModalOpen(false);
-  };
-
-  const handleCloseSelectModal = () => {
-    setIsSelectModalOpen(false);
+    setIsSelectModalOpen(true);
   };
 
   const handleSelectModalSubmit = () => {
@@ -91,32 +87,40 @@ const RecordPage = () => {
     setIsMetronomeModalOpen(true);
   };
 
-  const handleCloseMetronomeModal = () => {
-    setIsMetronomeModalOpen(false);
-  };
-
   const handleRecordComplete = () => {
     setIsMetronomeModalOpen(false);
-    setRecordDuration("1:31"); // 임의로 1:31로 설정
+    setRecordDuration("1:31");
     setIsSaveModalOpen(true);
   };
 
   const handleSave = (track) => {
-    setSelectedTracks([
-      ...selectedTracks,
-      {
-        id: selectedTracks.length + 1,
-        title: track.projectName,
-        bpm: `${track.bpm} BPM`,
-        duration: track.duration,
-        icon: `/path/to/${track.instrument.toLowerCase()}-icon.png`,
-      },
-    ]);
+    setRecord((prevRecord) => ({
+      ...prevRecord,
+      tracks: [
+        ...prevRecord.tracks,
+        {
+          id: prevRecord.tracks.length + 1,
+          title: track.projectName,
+          bpm: `${track.bpm} BPM`,
+          duration: track.duration,
+          icon: `/path/to/${track.instrument.toLowerCase()}-icon.png`,
+        },
+      ],
+    }));
     setIsSaveModalOpen(false);
   };
 
+  const handleCloseMetronomeModal = () => {
+    setIsMetronomeModalOpen(false);
+  };
+
+  const handleCloseSelectModal = () => {
+    setIsSelectModalOpen(false);
+  };
+
   const handleExport = () => {
-    // Export 로직 구현
+    // Export 로직을 여기서 구현합니다.
+    console.log("Exporting selected tracks:", selectedTracks);
   };
 
   if (!record) {
@@ -195,13 +199,12 @@ const RecordPage = () => {
         onClose={handleCloseTrackModal}
         tracks={record.tracks}
         onAddNewTrack={handleAddNewTrack}
-        onSelectTrack={handleRecordYourSection}
+        onRecordYourSection={handleRecordYourSection}
       />
       <SelectModal
         isOpen={isSelectModalOpen}
         onClose={handleCloseSelectModal}
         onInstrumentSelect={setSelectedInstrument}
-        bpm={record.bpm}
         onSubmit={handleSelectModalSubmit}
       />
       <MetronomeModal
