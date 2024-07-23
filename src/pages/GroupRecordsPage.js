@@ -1,7 +1,10 @@
+// src/pages/GroupRecordsPage.js
 import React, { useEffect, useState } from "react";
+import AddRecordModal from "../components/AddRecordModal";
 
 const GroupRecordsPage = ({ group, onRecordClick }) => {
   const [records, setRecords] = useState([]);
+  const [isAddRecordModalOpen, setIsAddRecordModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchGroupData = async () => {
@@ -17,10 +20,17 @@ const GroupRecordsPage = ({ group, onRecordClick }) => {
     fetchGroupData();
   }, [group.id]);
 
+  const handleAddRecord = (newRecord) => {
+    setRecords([...records, newRecord]);
+  };
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">{group.name}</h1>
-      <button className="bg-blue-500 text-white px-4 py-2 rounded mb-4">
+      <button
+        className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
+        onClick={() => setIsAddRecordModalOpen(true)}
+      >
         + Add New Record
       </button>
       <div className="space-y-4">
@@ -35,6 +45,11 @@ const GroupRecordsPage = ({ group, onRecordClick }) => {
           </div>
         ))}
       </div>
+      <AddRecordModal
+        isOpen={isAddRecordModalOpen}
+        onClose={() => setIsAddRecordModalOpen(false)}
+        onAddRecord={handleAddRecord}
+      />
     </div>
   );
 };
