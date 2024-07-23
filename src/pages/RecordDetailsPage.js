@@ -49,6 +49,7 @@ const RecordPage = () => {
         ],
       };
       setRecord(recordData);
+      setSelectedBpm(recordData.bpm); // 레코드의 BPM 설정
     };
 
     fetchRecordData();
@@ -119,7 +120,6 @@ const RecordPage = () => {
   };
 
   const handleExport = () => {
-    // Export 로직을 여기서 구현합니다.
     console.log("Exporting selected tracks:", selectedTracks);
   };
 
@@ -198,14 +198,15 @@ const RecordPage = () => {
         isOpen={isTrackModalOpen}
         onClose={handleCloseTrackModal}
         tracks={record.tracks}
-        onAddNewTrack={handleAddNewTrack}
         onRecordYourSection={handleRecordYourSection}
+        onAddNewTrack={handleAddNewTrack}
       />
       <SelectModal
         isOpen={isSelectModalOpen}
         onClose={handleCloseSelectModal}
         onInstrumentSelect={setSelectedInstrument}
         onSubmit={handleSelectModalSubmit}
+        bpm={selectedBpm}
       />
       <MetronomeModal
         isOpen={isMetronomeModalOpen}
