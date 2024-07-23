@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import TrackSelectionModal from "../components/TrackSelectionModal";
 import SelectModal from "../components/SelectModal";
 import MetronomeModal from "../components/MetronomeModal";
 import SaveModal from "../components/SaveModal";
+import Track from "../components/Track";
 
-const RecordPage = () => {
+const RecordDetailsPage = () => {
   const [record, setRecord] = useState(null);
   const [selectedTracks, setSelectedTracks] = useState([]);
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
@@ -14,6 +15,7 @@ const RecordPage = () => {
   const [selectedInstrument, setSelectedInstrument] = useState("");
   const [selectedBpm, setSelectedBpm] = useState("90");
   const [recordDuration, setRecordDuration] = useState("1:31");
+  const [tempTracks, setTempTracks] = useState([]);
 
   useEffect(() => {
     const fetchRecordData = async () => {
@@ -49,7 +51,6 @@ const RecordPage = () => {
         ],
       };
       setRecord(recordData);
-      setSelectedBpm(recordData.bpm); // 레코드의 BPM 설정
     };
 
     fetchRecordData();
@@ -72,23 +73,17 @@ const RecordPage = () => {
   };
 
   const handleTrackSelect = (track) => {
-    setRecord((prevRecord) => ({
-      ...prevRecord,
-      tracks: [...prevRecord.tracks, track],
-    }));
+    setTempTracks([...tempTracks, track]);
     setIsTrackModalOpen(false);
-  };
-
-  const handleRecordYourSection = (instrument, bpm) => {
-    setSelectedInstrument(instrument);
-    setSelectedBpm(bpm);
-    setIsTrackModalOpen(false);
-    setIsMetronomeModalOpen(true);
   };
 
   const handleAddNewTrack = () => {
     setIsTrackModalOpen(false);
     setIsSelectModalOpen(true);
+  };
+
+  const handleCloseSelectModal = () => {
+    setIsSelectModalOpen(false);
   };
 
   const handleSelectModalSubmit = () => {
@@ -103,32 +98,17 @@ const RecordPage = () => {
   };
 
   const handleSave = (track) => {
-    setRecord((prevRecord) => ({
-      ...prevRecord,
-      tracks: [
-        ...prevRecord.tracks,
-        {
-          id: prevRecord.tracks.length + 1,
-          title: track.projectName,
-          bpm: `${track.bpm} BPM`,
-          duration: track.duration,
-          icon: `/path/to/${track.instrument.toLowerCase()}-icon.png`,
-        },
-      ],
-    }));
+    setTempTracks([...tempTracks, track]);
     setIsSaveModalOpen(false);
   };
 
-  const handleCloseMetronomeModal = () => {
-    setIsMetronomeModalOpen(false);
+  const handleUploadTrack = (track) => {
+    setSelectedTracks([...selectedTracks, track]);
+    setTempTracks(tempTracks.filter((t) => t !== track));
   };
 
-  const handleCloseSelectModal = () => {
-    setIsSelectModalOpen(false);
-  };
-
-  const handleExport = () => {
-    console.log("Exporting selected tracks:", selectedTracks);
+  const handleRemoveTempTrack = (track) => {
+    setTempTracks(tempTracks.filter((t) => t !== track));
   };
 
   if (!record) {
@@ -187,10 +167,7 @@ const RecordPage = () => {
                 </div>
               ))}
             </div>
-            <button
-              onClick={handleExport}
-              className="mt-4 p-2 bg-blue-500 text-white rounded w-full"
-            >
+            <button className="mt-4 p-2 bg-blue-500 text-white rounded w-full">
               Export
             </button>
           </div>
@@ -206,34 +183,67 @@ const RecordPage = () => {
         isOpen={isTrackModalOpen}
         onClose={handleCloseTrackModal}
         tracks={record.tracks}
-        onRecordYourSection={handleRecordYourSection}
-        onTrackSelect={handleTrackSelect}
-        onAddNewTrack={handleAddNewTrack}
+        onTrackSelect={handleTrackSelect} // 기존 트랙 선택
+        onAddNewTrack={handleAddNewTrack} // 새로운 트랙 추가
       />
       <SelectModal
         isOpen={isSelectModalOpen}
         onClose={handleCloseSelectModal}
         onInstrumentSelect={setSelectedInstrument}
+        bpm={record.bpm}
         onSubmit={handleSelectModalSubmit}
-        bpm={selectedBpm}
       />
       <MetronomeModal
         isOpen={isMetronomeModalOpen}
-        onClose={handleCloseMetronomeModal}
+        onClose={() => setIsMetronomeModalOpen(false)}
         instrument={selectedInstrument}
-        bpm={selectedBpm}
+        bpm={record.bpm}
         onRecordComplete={handleRecordComplete}
       />
       <SaveModal
         isOpen={isSaveModalOpen}
         onClose={() => setIsSaveModalOpen(false)}
         instrument={selectedInstrument}
-        bpm={selectedBpm}
+        bpm={record.bpm}
         duration={recordDuration}
         onSave={handleSave}
       />
+      {tempTracks.length > 0 && (
+        <div className="fixed bottom-8 left-8 p-4 bg-white rounded-lg shadow-lg max-w-md w-full z-50">
+          <h3 className="text-xl font-bold mb-4">Temporary Tracks</h3>
+          <div className="space-y-2">
+            {tempTracks.map((track, index) => (
+              <div
+                key={index}
+                className="p-2 bg-gray-100 rounded-lg flex justify-between items-center"
+              >
+                <div>
+                  <div className="font-bold">{track.projectName}</div>
+                  <div className="text-sm text-gray-500">
+                    {track.instrument} - {track.bpm} BPM - {track.duration}
+                  </div>
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    className="bg-green-500 text-white px-2 py-1 rounded"
+                    onClick={() => handleUploadTrack(track)}
+                  >
+                    Upload
+                  </button>
+                  <button
+                    className="bg-red-500 text-white px-2 py-1 rounded"
+                    onClick={() => handleRemoveTempTrack(track)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default RecordPage;
+export default RecordDetailsPage;
