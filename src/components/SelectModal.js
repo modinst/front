@@ -1,5 +1,4 @@
-// src/components/SelectModal.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const SelectModal = ({
   isOpen,
@@ -9,10 +8,33 @@ const SelectModal = ({
   bpm,
 }) => {
   const [selectedInstrument, setSelectedInstrument] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedInstrument(""); // 모달이 열릴 때마다 초기화
+      setError(""); // 오류 메시지도 초기화
+    }
+  }, [isOpen]);
 
   const handleInstrumentSelect = (instrument) => {
     setSelectedInstrument(instrument);
     onInstrumentSelect(instrument);
+    setError(""); // Reset error message when instrument is selected
+  };
+
+  const handleSubmit = () => {
+    if (selectedInstrument) {
+      onSubmit();
+    } else {
+      setError("Please select an instrument.");
+    }
+  };
+
+  const getButtonClass = (instrument) => {
+    return selectedInstrument === instrument
+      ? "bg-blue-500 text-white p-2 rounded"
+      : "bg-gray-200 p-2 rounded";
   };
 
   if (!isOpen) return null;
@@ -24,36 +46,35 @@ const SelectModal = ({
         <div className="flex justify-around mb-4">
           <button
             onClick={() => handleInstrumentSelect("Guitar")}
-            className="bg-gray-200 p-2 rounded"
+            className={getButtonClass("Guitar")}
           >
             Guitar
           </button>
           <button
             onClick={() => handleInstrumentSelect("Drum")}
-            className="bg-gray-200 p-2 rounded"
+            className={getButtonClass("Drum")}
           >
             Drum
           </button>
           <button
             onClick={() => handleInstrumentSelect("Bass")}
-            className="bg-gray-200 p-2 rounded"
+            className={getButtonClass("Bass")}
           >
             Bass
           </button>
           <button
             onClick={() => handleInstrumentSelect("etc")}
-            className="bg-gray-200 p-2 rounded"
+            className={getButtonClass("etc")}
           >
             etc..
           </button>
         </div>
         <div className="mb-4">
-          <label htmlFor="bpm" className="block mb-2">
-            BPM: {bpm}
-          </label>
+          <label className="block mb-2">BPM: {bpm}</label>
         </div>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
         <button
-          onClick={onSubmit}
+          onClick={handleSubmit}
           className="bg-blue-500 text-white px-4 py-2 rounded"
         >
           Let's Record
