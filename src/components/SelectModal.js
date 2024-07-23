@@ -1,24 +1,18 @@
 // src/components/SelectModal.js
-import React from "react";
+import React, { useState } from "react";
 
 const SelectModal = ({
   isOpen,
   onClose,
   onInstrumentSelect,
-  onBpmSelect,
   onSubmit,
+  bpm,
 }) => {
-  const [selectedInstrument, setSelectedInstrument] = React.useState("");
-  const [selectedBpm, setSelectedBpm] = React.useState("90");
+  const [selectedInstrument, setSelectedInstrument] = useState("");
 
   const handleInstrumentSelect = (instrument) => {
     setSelectedInstrument(instrument);
     onInstrumentSelect(instrument);
-  };
-
-  const handleBpmSelect = (e) => {
-    setSelectedBpm(e.target.value);
-    onBpmSelect(e.target.value);
   };
 
   if (!isOpen) return null;
@@ -26,7 +20,7 @@ const SelectModal = ({
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto p-4">
-        <h2 className="text-xl font-bold mb-4">Select Order Status</h2>
+        <h2 className="text-xl font-bold mb-4">Select Instrument</h2>
         <div className="flex justify-around mb-4">
           <button
             onClick={() => handleInstrumentSelect("Guitar")}
@@ -55,20 +49,8 @@ const SelectModal = ({
         </div>
         <div className="mb-4">
           <label htmlFor="bpm" className="block mb-2">
-            BPM
+            BPM: {bpm}
           </label>
-          <select
-            id="bpm"
-            value={selectedBpm}
-            onChange={handleBpmSelect}
-            className="block w-full p-2 border rounded"
-          >
-            {Array.from({ length: 21 }, (_, i) => 60 + i * 5).map((bpm) => (
-              <option key={bpm} value={bpm}>
-                {bpm}
-              </option>
-            ))}
-          </select>
         </div>
         <button
           onClick={onSubmit}
