@@ -71,6 +71,14 @@ const RecordPage = () => {
     setIsTrackModalOpen(false);
   };
 
+  const handleTrackSelect = (track) => {
+    setRecord((prevRecord) => ({
+      ...prevRecord,
+      tracks: [...prevRecord.tracks, track],
+    }));
+    setIsTrackModalOpen(false);
+  };
+
   const handleRecordYourSection = (instrument, bpm) => {
     setSelectedInstrument(instrument);
     setSelectedBpm(bpm);
@@ -199,6 +207,7 @@ const RecordPage = () => {
         onClose={handleCloseTrackModal}
         tracks={record.tracks}
         onRecordYourSection={handleRecordYourSection}
+        onTrackSelect={handleTrackSelect}
         onAddNewTrack={handleAddNewTrack}
       />
       <SelectModal

@@ -6,6 +6,7 @@ const TrackSelectionModal = ({
   onClose,
   tracks,
   onRecordYourSection,
+  onTrackSelect,
   onAddNewTrack,
 }) => {
   if (!isOpen) return null;
@@ -22,7 +23,7 @@ const TrackSelectionModal = ({
               bpm={track.bpm}
               duration={track.duration}
               icon={track.icon}
-              onClick={() => onRecordYourSection(track.instrument, track.bpm)}
+              onClick={() => onTrackSelect(track)}
             />
           ))}
         </div>
