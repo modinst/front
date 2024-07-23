@@ -56,18 +56,23 @@ const MyPage = () => {
   };
 
   const handleSave = (track) => {
-    setTracks([
-      ...tracks,
-      {
-        id: tracks.length + 1,
-        title: track.projectName,
-        bpm: `${track.bpm} BPM`,
-        duration: track.duration,
-        icon: `/path/to/${track.instrument.toLowerCase()}-icon.png`,
-      },
-    ]);
+    const newTrack = {
+      id: new Date().getTime(),
+      title: track.projectName,
+      bpm: `${track.bpm} BPM`,
+      duration: track.duration,
+      icon: `/path/to/${track.instrument.toLowerCase()}-icon.png`,
+    };
+    const savedTrack = saveTrackToLocalStorage(newTrack);
+    setTracks([...tracks, savedTrack]);
     setIsSaveModalOpen(false);
   };
+
+  const saveTrackToLocalStorage = (track) => {
+    const savedTracks = JSON.parse(localStorage.getItem("tracks")) || [];
+    savedTracks.push(track);
+    localStorage.setItem("tracks", JSON.stringify(savedTracks));
+    return track;
 
   return (
     <div className="p-4">

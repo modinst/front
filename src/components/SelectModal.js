@@ -4,16 +4,18 @@ const SelectModal = ({
   isOpen,
   onClose,
   onInstrumentSelect,
+  onBpmSelect,
   onSubmit,
-  bpm,
 }) => {
   const [selectedInstrument, setSelectedInstrument] = useState("");
+  const [selectedBpm, setSelectedBpm] = useState("90");
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (isOpen) {
-      setSelectedInstrument(""); // 모달이 열릴 때마다 초기화
-      setError(""); // 오류 메시지도 초기화
+      setSelectedInstrument("");
+      setSelectedBpm("90");
+      setError("");
     }
   }, [isOpen]);
 
@@ -21,6 +23,11 @@ const SelectModal = ({
     setSelectedInstrument(instrument);
     onInstrumentSelect(instrument);
     setError(""); // Reset error message when instrument is selected
+  };
+
+  const handleBpmSelect = (e) => {
+    setSelectedBpm(e.target.value);
+    onBpmSelect(e.target.value);
   };
 
   const handleSubmit = () => {
@@ -70,7 +77,21 @@ const SelectModal = ({
           </button>
         </div>
         <div className="mb-4">
-          <label className="block mb-2">BPM: {bpm}</label>
+          <label htmlFor="bpm" className="block mb-2">
+            BPM
+          </label>
+          <select
+            id="bpm"
+            value={selectedBpm}
+            onChange={handleBpmSelect}
+            className="block w-full p-2 border rounded"
+          >
+            {Array.from({ length: 21 }, (_, i) => 60 + i * 5).map((bpm) => (
+              <option key={bpm} value={bpm}>
+                {bpm}
+              </option>
+            ))}
+          </select>
         </div>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <button
