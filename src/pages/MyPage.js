@@ -1,3 +1,4 @@
+// src/pages/MyPage.js
 import React, { useState, useEffect } from "react";
 import Track from "../components/Track";
 import SelectModal from "../components/SelectModal";
@@ -44,7 +45,8 @@ const MyPage = () => {
     fetchTracks();
   }, []);
 
-  const handleSelectModalSubmit = () => {
+  const handleSelectModalSubmit = (newBpm) => {
+    setSelectedBpm(newBpm);
     setIsSelectModalOpen(false);
     setIsMetronomeModalOpen(true);
   };
@@ -56,23 +58,18 @@ const MyPage = () => {
   };
 
   const handleSave = (track) => {
-    const newTrack = {
-      id: new Date().getTime(),
-      title: track.projectName,
-      bpm: `${track.bpm} BPM`,
-      duration: track.duration,
-      icon: `/path/to/${track.instrument.toLowerCase()}-icon.png`,
-    };
-    const savedTrack = saveTrackToLocalStorage(newTrack);
-    setTracks([...tracks, savedTrack]);
+    setTracks([
+      ...tracks,
+      {
+        id: tracks.length + 1,
+        title: track.projectName,
+        bpm: `${track.bpm} BPM`,
+        duration: track.duration,
+        icon: `/path/to/${track.instrument.toLowerCase()}-icon.png`,
+      },
+    ]);
     setIsSaveModalOpen(false);
   };
-
-  const saveTrackToLocalStorage = (track) => {
-    const savedTracks = JSON.parse(localStorage.getItem("tracks")) || [];
-    savedTracks.push(track);
-    localStorage.setItem("tracks", JSON.stringify(savedTracks));
-    return track;
 
   return (
     <div className="p-4">
@@ -96,8 +93,9 @@ const MyPage = () => {
         isOpen={isSelectModalOpen}
         onClose={() => setIsSelectModalOpen(false)}
         onInstrumentSelect={setSelectedInstrument}
-        onBpmSelect={setSelectedBpm}
+        bpm={selectedBpm}
         onSubmit={handleSelectModalSubmit}
+        isBpmEditable={true} // BPM 변경 가능
       />
       <MetronomeModal
         isOpen={isMetronomeModalOpen}

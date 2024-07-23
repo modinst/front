@@ -1,3 +1,4 @@
+// src/pages/RecordDetailsPage.js
 import React, { useState, useEffect } from "react";
 import TrackSelectionModal from "../components/TrackSelectionModal";
 import SelectModal from "../components/SelectModal";
@@ -212,6 +213,7 @@ const RecordDetailsPage = ({ userId }) => {
         onInstrumentSelect={setSelectedInstrument}
         bpm={record.bpm}
         onSubmit={handleSelectModalSubmit}
+        isBpmEditable={false} // BPM 변경 불가
       />
       <MetronomeModal
         isOpen={isMetronomeModalOpen}

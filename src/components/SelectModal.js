@@ -1,23 +1,25 @@
+// src/components/SelectModal.js
 import React, { useState, useEffect } from "react";
 
 const SelectModal = ({
   isOpen,
   onClose,
   onInstrumentSelect,
-  onBpmSelect,
   onSubmit,
+  bpm,
+  isBpmEditable,
 }) => {
   const [selectedInstrument, setSelectedInstrument] = useState("");
-  const [selectedBpm, setSelectedBpm] = useState("90");
+  const [selectedBpm, setSelectedBpm] = useState(bpm);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (isOpen) {
-      setSelectedInstrument("");
-      setSelectedBpm("90");
-      setError("");
+      setSelectedInstrument(""); // 모달이 열릴 때마다 초기화
+      setSelectedBpm(bpm); // 초기 BPM 설정
+      setError(""); // 오류 메시지도 초기화
     }
-  }, [isOpen]);
+  }, [isOpen, bpm]);
 
   const handleInstrumentSelect = (instrument) => {
     setSelectedInstrument(instrument);
@@ -25,14 +27,13 @@ const SelectModal = ({
     setError(""); // Reset error message when instrument is selected
   };
 
-  const handleBpmSelect = (e) => {
+  const handleBpmChange = (e) => {
     setSelectedBpm(e.target.value);
-    onBpmSelect(e.target.value);
   };
 
   const handleSubmit = () => {
     if (selectedInstrument) {
-      onSubmit();
+      onSubmit(selectedBpm);
     } else {
       setError("Please select an instrument.");
     }
@@ -77,21 +78,25 @@ const SelectModal = ({
           </button>
         </div>
         <div className="mb-4">
-          <label htmlFor="bpm" className="block mb-2">
-            BPM
-          </label>
-          <select
-            id="bpm"
-            value={selectedBpm}
-            onChange={handleBpmSelect}
-            className="block w-full p-2 border rounded"
-          >
-            {Array.from({ length: 21 }, (_, i) => 60 + i * 5).map((bpm) => (
-              <option key={bpm} value={bpm}>
-                {bpm}
-              </option>
-            ))}
-          </select>
+          <label className="block mb-2">BPM</label>
+          {isBpmEditable ? (
+            <select
+              id="bpm"
+              value={selectedBpm}
+              onChange={handleBpmChange}
+              className="block w-full p-2 border rounded"
+            >
+              {Array.from({ length: 21 }, (_, i) => 60 + i * 5).map(
+                (bpmValue) => (
+                  <option key={bpmValue} value={bpmValue}>
+                    {bpmValue}
+                  </option>
+                )
+              )}
+            </select>
+          ) : (
+            <div className="block w-full p-2 border rounded">{bpm}</div>
+          )}
         </div>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <button
