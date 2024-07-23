@@ -1,42 +1,44 @@
-// src/components/TrackSelectionModal.js
 import React from "react";
+import Track from "./Track";
 
 const TrackSelectionModal = ({
   isOpen,
   onClose,
   tracks,
-  onAddNewTrack,
-  onSelectTrack,
+  onRecordYourSection,
 }) => {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto p-4">
-        <h2 className="text-xl font-bold mb-4">Select Your Track to Record</h2>
-        <div className="flex flex-col space-y-2 mb-4">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl mx-auto p-8">
+        <h2 className="text-2xl font-bold mb-8">Select Track</h2>
+        <div className="space-y-4">
           {tracks.map((track) => (
-            <button
+            <Track
               key={track.id}
-              onClick={() => onSelectTrack(track)}
-              className="bg-gray-200 p-2 rounded text-left"
-            >
-              {track.title} - {track.bpm} BPM
-            </button>
+              title={track.title}
+              bpm={track.bpm}
+              duration={track.duration}
+              icon={track.icon}
+              onClick={() => onRecordYourSection(track.instrument, track.bpm)}
+            />
           ))}
         </div>
-        <button
-          onClick={onAddNewTrack}
-          className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
-        >
-          Add New Track
-        </button>
-        <button
-          onClick={onClose}
-          className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
-        >
-          Close
-        </button>
+        <div className="flex justify-between mt-8">
+          <button
+            onClick={() => onRecordYourSection(null, null)}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Add New Track
+          </button>
+          <button
+            onClick={onClose}
+            className="bg-red-500 text-white px-4 py-2 rounded"
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
   );
