@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+// src/pages/MainPage.js
+import React, { useState, useContext } from "react";
 import Sidebar from "../components/Sidebar";
 import MyPage from "./MyPage";
 import GroupPage from "./GroupPage";
 import GroupRecordsPage from "./GroupRecordsPage";
 import RecordDetailsPage from "./RecordDetailsPage";
+import LoginPage from "./LoginPage";
+import { AuthContext } from "../contexts/AuthContext";
 
 const MainPage = () => {
+  const { state } = useContext(AuthContext);
   const [activePage, setActivePage] = useState("home");
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedRecordId, setSelectedRecordId] = useState(null);
@@ -49,6 +53,10 @@ const MainPage = () => {
         return <h1 className="text-2xl font-bold">Home Page</h1>;
     }
   };
+
+  if (!state.isAuthenticated) {
+    return <LoginPage />;
+  }
 
   return (
     <div className="flex">
