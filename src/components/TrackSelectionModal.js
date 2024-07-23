@@ -5,7 +5,6 @@ const TrackSelectionModal = ({
   isOpen,
   onClose,
   tracks,
-  onRecordYourSection,
   onTrackSelect,
   onAddNewTrack,
 }) => {
@@ -15,7 +14,7 @@ const TrackSelectionModal = ({
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl mx-auto p-8">
         <h2 className="text-2xl font-bold mb-8">Select Track</h2>
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-y-auto max-h-96">
           {tracks.map((track) => (
             <Track
               key={track.id}
