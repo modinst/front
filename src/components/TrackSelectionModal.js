@@ -12,9 +12,9 @@ const TrackSelectionModal = ({
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl mx-auto p-8">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl mx-auto p-8 overflow-y-auto max-h-[80vh]">
         <h2 className="text-2xl font-bold mb-8">Select Track</h2>
-        <div className="space-y-4 overflow-y-auto max-h-96">
+        <div className="space-y-4">
           {tracks.map((track) => (
             <Track
               key={track.id}

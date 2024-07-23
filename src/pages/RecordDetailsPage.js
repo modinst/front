@@ -5,7 +5,7 @@ import MetronomeModal from "../components/MetronomeModal";
 import SaveModal from "../components/SaveModal";
 import Track from "../components/Track";
 
-const RecordDetailsPage = () => {
+const RecordDetailsPage = ({ userId }) => {
   const [record, setRecord] = useState(null);
   const [selectedTracks, setSelectedTracks] = useState([]);
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
@@ -97,18 +97,30 @@ const RecordDetailsPage = () => {
     setIsSaveModalOpen(true);
   };
 
+  const saveTrackToLocalStorage = (track) => {
+    const savedTracks = JSON.parse(localStorage.getItem("tracks")) || [];
+    savedTracks.push(track);
+    localStorage.setItem("tracks", JSON.stringify(savedTracks));
+    return track;
+  };
+
   const handleSave = (track) => {
-    setTempTracks([...tempTracks, track]);
+    const savedTrack = saveTrackToLocalStorage(track);
+    const updatedTempTracks = [...tempTracks, savedTrack];
+    setTempTracks(updatedTempTracks);
     setIsSaveModalOpen(false);
   };
 
   const handleUploadTrack = (track) => {
-    setSelectedTracks([...selectedTracks, track]);
-    setTempTracks(tempTracks.filter((t) => t !== track));
+    const updatedRecordTracks = [...record.tracks, track];
+    setRecord({ ...record, tracks: updatedRecordTracks });
+    const updatedTempTracks = tempTracks.filter((t) => t !== track);
+    setTempTracks(updatedTempTracks);
   };
 
   const handleRemoveTempTrack = (track) => {
-    setTempTracks(tempTracks.filter((t) => t !== track));
+    const updatedTempTracks = tempTracks.filter((t) => t !== track);
+    setTempTracks(updatedTempTracks);
   };
 
   if (!record) {
@@ -215,10 +227,10 @@ const RecordDetailsPage = () => {
             {tempTracks.map((track, index) => (
               <div
                 key={index}
-                className="p-2 bg-gray-100 rounded-lg flex justify-between items-center"
+                className="bg-gray-100 rounded-lg shadow-md p-2 flex justify-between items-center"
               >
                 <div>
-                  <div className="font-bold">{track.projectName}</div>
+                  <div className="font-semibold">{track.title}</div>
                   <div className="text-sm text-gray-500">
                     {track.instrument} - {track.bpm} BPM - {track.duration}
                   </div>
