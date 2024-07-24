@@ -1,13 +1,20 @@
 // src/App.js
 import React from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { Provider } from "react-redux";
+import store from "./store";
 import MainPage from "./pages/MainPage";
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <MainPage />
-    </div>
+    <Provider store={store}>
+      <Router>
+        <Switch>
+          <Route path="/" component={MainPage} />
+        </Switch>
+      </Router>
+    </Provider>
   );
-}
+};
 
 export default App;
