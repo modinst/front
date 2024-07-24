@@ -20,15 +20,24 @@ const MainPage = () => {
   };
 
   const renderPage = () => {
-    if (!isAuthenticated && activePage !== "login") {
-      return <LoginPage onLoginSuccess={handleLoginSuccess} />;
+    if (!isAuthenticated && activePage !== "home" && activePage !== "login") {
+      return (
+        <div className="text-2xl font-bold p-4">
+          Access Denied. Please log in.
+        </div>
+      );
     }
 
     switch (activePage) {
       case "mypage":
         return <MyPage />;
       case "home":
-        return <HomePage />;
+        return (
+          <HomePage
+            onLoginClick={() => setActivePage("login")}
+            isAuthenticated={isAuthenticated}
+          />
+        );
       case "groups":
         return (
           <GroupPage
@@ -61,7 +70,12 @@ const MainPage = () => {
       case "login":
         return <LoginPage onLoginSuccess={handleLoginSuccess} />;
       default:
-        return <HomePage />;
+        return (
+          <HomePage
+            onLoginClick={() => setActivePage("login")}
+            isAuthenticated={isAuthenticated}
+          />
+        );
     }
   };
 
