@@ -27,7 +27,9 @@ const MainPage = () => {
         });
         if (response.ok) {
           const data = await response.json();
-          dispatch(login({ username: data.user.username }));
+          dispatch(
+            login({ email: data.user.email, username: data.user.username })
+          );
         }
       } catch (error) {
         console.error("Failed to check session", error);
