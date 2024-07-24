@@ -14,6 +14,7 @@ import RegisterPage from "./RegisterPage";
 
 const MainPage = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const [activePage, setActivePage] = useState("home");
   const [selectedGroup, setSelectedGroup] = useState(null);
@@ -28,6 +29,7 @@ const MainPage = () => {
             loginAction({
               email: data.user.email,
               username: data.user.username,
+              id: data.user.id,
             })
           );
         } else {

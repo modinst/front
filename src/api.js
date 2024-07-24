@@ -22,3 +22,11 @@ export const getGroups = () => apiClient.get("/groups");
 
 export const createGroup = (name, description, image) =>
   apiClient.post("/groups", { name, description, image });
+
+// 특정 유저의 트랙들을 가져오는 함수
+export const getUserTracks = (userId) =>
+  apiClient.get(`/users/${userId}/tracks`);
+
+// 새로운 트랙을 추가하는 함수
+export const saveTrack = (userId, track) =>
+  apiClient.post(`/users/${userId}/tracks`, track);
