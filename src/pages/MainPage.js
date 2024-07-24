@@ -24,6 +24,7 @@ const MainPage = () => {
     const checkUserSession = async () => {
       try {
         const { data } = await checkSession();
+        console.log("Session data:", data);
         if (data.user) {
           dispatch(
             loginAction({
@@ -33,11 +34,11 @@ const MainPage = () => {
             })
           );
         } else {
-          dispatch(logoutAction()); // 세션이 없을 경우 로그아웃 상태로 설정
+          dispatch(logoutAction());
         }
       } catch (error) {
         console.error("Failed to check session", error);
-        dispatch(logoutAction()); // 세션 확인 실패 시 로그아웃 상태로 설정
+        dispatch(logoutAction());
       }
     };
 

@@ -19,6 +19,7 @@ const MyPage = () => {
   const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
+    console.log("User:", user); // 유저 정보 로그
     const fetchTracks = async () => {
       if (!user || !user.id) {
         console.error("User is not defined");
@@ -51,6 +52,7 @@ const MyPage = () => {
   };
 
   const handleSave = async (track) => {
+    console.log("Saving track:", track); // 트랙 저장 정보 로그
     if (!user || !user.id) {
       console.error("User is not defined");
       return;
@@ -62,6 +64,7 @@ const MyPage = () => {
       duration: track.duration,
       instrument: track.instrument,
       isPublic: track.isPublic,
+      icon: `/path/to/${track.instrument.toLowerCase()}-icon.png`, // Assuming 'icon' is the path to the track
     };
 
     try {
