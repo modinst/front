@@ -1,43 +1,39 @@
-// src/pages/LoginPage.js
+// src/pages/RegisterPage.js
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { login } from "../store";
 
-const LoginPage = ({ onLoginSuccess }) => {
+const RegisterPage = ({ onRegisterSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const dispatch = useDispatch();
+  const [username, setUsername] = useState("");
 
-  const handleLogin = async (event) => {
+  const handleRegister = async (event) => {
     event.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/login", {
+      const response = await fetch("http://localhost:5000/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // 세션 쿠키를 포함
-        body: JSON.stringify({ email, password }),
+        credentials: "include",
+        body: JSON.stringify({ email, password, username }),
       });
 
       if (response.ok) {
-        const data = await response.json();
-        dispatch(login({ email: data.email, username: data.username }));
-        onLoginSuccess();
+        onRegisterSuccess();
       } else {
-        alert("Invalid credentials");
+        alert("Registration failed");
       }
     } catch (error) {
-      console.error("Error logging in:", error);
+      console.error("Error registering:", error);
       alert("An error occurred. Please try again.");
     }
   };
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Login</h1>
-      <form onSubmit={handleLogin}>
+      <h1 className="text-2xl font-bold mb-4">Register</h1>
+      <form onSubmit={handleRegister}>
         <div className="mb-4">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
@@ -50,6 +46,22 @@ const LoginPage = ({ onLoginSuccess }) => {
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="username"
+          >
+            Username
+          </label>
+          <input
+            type="text"
+            id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             required
           />
@@ -73,9 +85,9 @@ const LoginPage = ({ onLoginSuccess }) => {
         <div className="flex items-center justify-between">
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           >
-            Login
+            Register
           </button>
         </div>
       </form>
@@ -83,4 +95,4 @@ const LoginPage = ({ onLoginSuccess }) => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;
