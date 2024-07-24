@@ -1,7 +1,8 @@
 // src/pages/MainPage.js
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { login } from "../store";
+import { login as loginAction, logout as logoutAction } from "../store";
+import { checkSession } from "../api";
 import Sidebar from "../components/Sidebar";
 import HomePage from "./HomePage";
 import MyPage from "./MyPage";
@@ -19,24 +20,26 @@ const MainPage = () => {
   const [selectedRecordId, setSelectedRecordId] = useState(null);
 
   useEffect(() => {
-    const checkSession = async () => {
+    const checkUserSession = async () => {
       try {
-        const response = await fetch("http://localhost:5000/check-session", {
-          method: "GET",
-          credentials: "include", // 세션 쿠키를 포함
-        });
-        if (response.ok) {
-          const data = await response.json();
+        const { data } = await checkSession();
+        if (data.user) {
           dispatch(
-            login({ email: data.user.email, username: data.user.username })
+            loginAction({
+              email: data.user.email,
+              username: data.user.username,
+            })
           );
+        } else {
+          dispatch(logoutAction()); // 세션이 없을 경우 로그아웃 상태로 설정
         }
       } catch (error) {
         console.error("Failed to check session", error);
+        dispatch(logoutAction()); // 세션 확인 실패 시 로그아웃 상태로 설정
       }
     };
 
-    checkSession();
+    checkUserSession();
   }, [dispatch]);
 
   const handleLoginSuccess = () => {

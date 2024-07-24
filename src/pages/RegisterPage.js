@@ -1,5 +1,6 @@
 // src/pages/RegisterPage.js
 import React, { useState } from "react";
+import { register } from "../api";
 
 const RegisterPage = ({ onRegisterSuccess }) => {
   const [email, setEmail] = useState("");
@@ -10,23 +11,11 @@ const RegisterPage = ({ onRegisterSuccess }) => {
     event.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ email, password, username }),
-      });
-
-      if (response.ok) {
-        onRegisterSuccess();
-      } else {
-        alert("Registration failed");
-      }
+      await register(email, password, username);
+      onRegisterSuccess();
     } catch (error) {
       console.error("Error registering:", error);
-      alert("An error occurred. Please try again.");
+      alert("Registration failed: " + error.response.data.message);
     }
   };
 
