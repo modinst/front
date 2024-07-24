@@ -24,9 +24,18 @@ export const createGroup = (name, description, image) =>
   apiClient.post("/groups", { name, description, image });
 
 // 특정 유저의 트랙들을 가져오는 함수
-export const getUserTracks = (userId) =>
-  apiClient.get(`/users/${userId}/tracks`);
+export const getUserTracks = async (userId) => {
+  return axios.get(`http://172.10.7.103/api/users/${userId}/tracks`, {
+    withCredentials: true, // 세션 쿠키 포함
+  });
+};
 
-// 새로운 트랙을 추가하는 함수
-export const saveTrack = (userId, track) =>
-  apiClient.post(`/users/${userId}/tracks`, track);
+export const saveTrack = async (userId, trackData) => {
+  return axios.post(
+    `http://172.10.7.103/api/users/${userId}/tracks`,
+    trackData,
+    {
+      withCredentials: true, // 세션 쿠키 포함
+    }
+  );
+};

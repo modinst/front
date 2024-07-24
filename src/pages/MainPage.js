@@ -24,7 +24,7 @@ const MainPage = () => {
     const checkUserSession = async () => {
       try {
         const { data } = await checkSession();
-        console.log("Session data:", data);
+        console.log("Session data:", data); // 세션 데이터 로그
         if (data.user) {
           dispatch(
             loginAction({
@@ -39,6 +39,7 @@ const MainPage = () => {
       } catch (error) {
         console.error("Failed to check session", error);
         dispatch(logoutAction());
+        setActivePage("login"); // 세션 확인 실패 시 로그인 페이지로 이동
       }
     };
 

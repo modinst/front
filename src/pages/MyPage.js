@@ -64,7 +64,7 @@ const MyPage = () => {
       duration: track.duration,
       instrument: track.instrument,
       isPublic: track.isPublic,
-      icon: `/path/to/${track.instrument.toLowerCase()}-icon.png`, // Assuming 'icon' is the path to the track
+      track_path: `/path/to/${track.instrument.toLowerCase()}-icon.png`, // Assuming 'track_path' is the path to the track
     };
 
     try {
