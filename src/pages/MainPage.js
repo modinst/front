@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import Sidebar from "../components/Sidebar";
+import HomePage from "./HomePage";
 import MyPage from "./MyPage";
 import GroupPage from "./GroupPage";
 import GroupRecordsPage from "./GroupRecordsPage";
@@ -14,28 +15,20 @@ const MainPage = () => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedRecordId, setSelectedRecordId] = useState(null);
 
+  const handleLoginSuccess = () => {
+    setActivePage("home");
+  };
+
   const renderPage = () => {
-    if (!isAuthenticated && activePage !== "home") {
-      return <LoginPage />;
+    if (!isAuthenticated && activePage !== "login") {
+      return <LoginPage onLoginSuccess={handleLoginSuccess} />;
     }
 
     switch (activePage) {
       case "mypage":
         return <MyPage />;
       case "home":
-        return (
-          <div>
-            <h1 className="text-2xl font-bold">Home Page</h1>
-            {!isAuthenticated && (
-              <button
-                onClick={() => setActivePage("login")}
-                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                Login
-              </button>
-            )}
-          </div>
-        );
+        return <HomePage />;
       case "groups":
         return (
           <GroupPage
@@ -66,9 +59,9 @@ const MainPage = () => {
       case "settings":
         return <h1 className="text-2xl font-bold">Settings Page</h1>;
       case "login":
-        return <LoginPage />;
+        return <LoginPage onLoginSuccess={handleLoginSuccess} />;
       default:
-        return <h1 className="text-2xl font-bold">Home Page</h1>;
+        return <HomePage />;
     }
   };
 

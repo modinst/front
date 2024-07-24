@@ -3,16 +3,48 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { login } from "../store";
 
-const LoginPage = () => {
+// 목 유저 데이터
+const MOCK_USERS = [
+  { username: "user1", password: "password1" },
+  { username: "user2", password: "password2" },
+  { username: "user3", password: "password3" },
+];
+
+const LoginPage = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
 
   const handleLogin = async (event) => {
     event.preventDefault();
+    console.log("Login attempt:", { username, password });
+
+    const mockFetch = (url, options) => {
+      return new Promise((resolve) => {
+        const { username, password } = JSON.parse(options.body);
+        const user = MOCK_USERS.find(
+          (u) => u.username === username && u.password === password
+        );
+
+        if (user) {
+          console.log("User found:", user);
+          resolve({
+            ok: true,
+            json: () => Promise.resolve({ username: user.username }),
+          });
+        } else {
+          console.log("User not found");
+          resolve({
+            ok: false,
+            status: 401,
+            json: () => Promise.resolve({ message: "Invalid credentials" }),
+          });
+        }
+      });
+    };
 
     try {
-      const response = await fetch("http://localhost:5000/login", {
+      const response = await mockFetch("http://localhost:5000/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -22,7 +54,9 @@ const LoginPage = () => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log("Login successful:", data);
         dispatch(login({ username: data.username }));
+        onLoginSuccess(); // 로그인 성공 시 콜백 호출
       } else {
         alert("Invalid credentials");
       }
