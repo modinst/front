@@ -13,8 +13,7 @@ const Sidebar = ({ onMenuClick }) => {
       dispatch(logoutAction());
       onMenuClick("login");
     } catch (error) {
-      console.error("Error logging out:", error);
-      alert("Logout failed: " + error.message);
+      console.error("Failed to logout:", error);
     }
   };
 

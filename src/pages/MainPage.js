@@ -22,7 +22,7 @@ const MainPage = () => {
   useEffect(() => {
     const checkUserSession = async () => {
       try {
-        const data = await checkSession();
+        const { data } = await checkSession();
         dispatch(
           loginAction({ email: data.user.email, username: data.user.username })
         );

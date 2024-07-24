@@ -13,14 +13,12 @@ const LoginPage = ({ onLoginSuccess }) => {
     event.preventDefault();
 
     try {
-      const userData = await login(email, password);
-      dispatch(
-        loginAction({ email: userData.email, username: userData.username })
-      );
+      const { data } = await login(email, password);
+      dispatch(loginAction({ email: data.email, username: data.username }));
       onLoginSuccess();
     } catch (error) {
       console.error("Error logging in:", error);
-      alert("Login failed: " + error.message);
+      alert("Login failed: " + error.response.data.message);
     }
   };
 

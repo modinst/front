@@ -1,42 +1,24 @@
 // src/api.js
+import axios from "axios";
+
 const BASE_URL = "http://172.10.7.103/api";
 
-const request = async (endpoint, method = "GET", body) => {
-  const headers = {
-    "Content-Type": "application/json",
-  };
-
-  const options = {
-    method,
-    headers,
-    credentials: "include",
-  };
-
-  if (body) {
-    options.body = JSON.stringify(body);
-  }
-
-  const response = await fetch(`${BASE_URL}${endpoint}`, options);
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Something went wrong");
-  }
-
-  return response.json();
-};
+const apiClient = axios.create({
+  baseURL: BASE_URL,
+  withCredentials: true, // 세션 쿠키를 포함
+});
 
 export const register = (email, password, username) =>
-  request("/register", "POST", { email, password, username });
+  apiClient.post("/register", { email, password, username });
 
 export const login = (email, password) =>
-  request("/login", "POST", { email, password });
+  apiClient.post("/login", { email, password });
 
-export const checkSession = () => request("/check-session");
+export const checkSession = () => apiClient.get("/check-session");
 
-export const logout = () => request("/logout");
+export const logout = () => apiClient.post("/logout");
 
-export const getGroups = () => request("/groups");
+export const getGroups = () => apiClient.get("/groups");
 
 export const createGroup = (name, description, image) =>
-  request("/groups", "POST", { name, description, image });
+  apiClient.post("/groups", { name, description, image });

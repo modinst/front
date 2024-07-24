@@ -15,7 +15,7 @@ const RegisterPage = ({ onRegisterSuccess }) => {
       onRegisterSuccess();
     } catch (error) {
       console.error("Error registering:", error);
-      alert("Registration failed: " + error.message);
+      alert("Registration failed: " + error.response.data.message);
     }
   };
 
