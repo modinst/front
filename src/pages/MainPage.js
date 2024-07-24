@@ -1,7 +1,7 @@
 // src/pages/MainPage.js
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { login as loginAction } from "../store";
+import { login as loginAction, logout as logoutAction } from "../store";
 import { checkSession } from "../api";
 import Sidebar from "../components/Sidebar";
 import HomePage from "./HomePage";
@@ -23,11 +23,19 @@ const MainPage = () => {
     const checkUserSession = async () => {
       try {
         const { data } = await checkSession();
-        dispatch(
-          loginAction({ email: data.user.email, username: data.user.username })
-        );
+        if (data.user) {
+          dispatch(
+            loginAction({
+              email: data.user.email,
+              username: data.user.username,
+            })
+          );
+        } else {
+          dispatch(logoutAction()); // 세션이 없을 경우 로그아웃 상태로 설정
+        }
       } catch (error) {
         console.error("Failed to check session", error);
+        dispatch(logoutAction()); // 세션 확인 실패 시 로그아웃 상태로 설정
       }
     };
 
