@@ -1,7 +1,8 @@
 // src/pages/MainPage.js
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { login } from "../store";
+import { login as loginAction } from "../store";
+import { checkSession } from "../api";
 import Sidebar from "../components/Sidebar";
 import HomePage from "./HomePage";
 import MyPage from "./MyPage";
@@ -19,24 +20,18 @@ const MainPage = () => {
   const [selectedRecordId, setSelectedRecordId] = useState(null);
 
   useEffect(() => {
-    const checkSession = async () => {
+    const checkUserSession = async () => {
       try {
-        const response = await fetch("http://localhost:5000/check-session", {
-          method: "GET",
-          credentials: "include", // 세션 쿠키를 포함
-        });
-        if (response.ok) {
-          const data = await response.json();
-          dispatch(
-            login({ email: data.user.email, username: data.user.username })
-          );
-        }
+        const data = await checkSession();
+        dispatch(
+          loginAction({ email: data.user.email, username: data.user.username })
+        );
       } catch (error) {
         console.error("Failed to check session", error);
       }
     };
 
-    checkSession();
+    checkUserSession();
   }, [dispatch]);
 
   const handleLoginSuccess = () => {

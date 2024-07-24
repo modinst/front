@@ -1,7 +1,8 @@
 // src/pages/LoginPage.js
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { login } from "../store";
+import { login as loginAction } from "../store";
+import { login } from "../api";
 
 const LoginPage = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
@@ -12,25 +13,14 @@ const LoginPage = ({ onLoginSuccess }) => {
     event.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // 세션 쿠키를 포함
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        dispatch(login({ email: data.email, username: data.username }));
-        onLoginSuccess();
-      } else {
-        alert("Invalid credentials");
-      }
+      const userData = await login(email, password);
+      dispatch(
+        loginAction({ email: userData.email, username: userData.username })
+      );
+      onLoginSuccess();
     } catch (error) {
       console.error("Error logging in:", error);
-      alert("An error occurred. Please try again.");
+      alert("Login failed: " + error.message);
     }
   };
 
