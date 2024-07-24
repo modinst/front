@@ -1,25 +1,41 @@
 // src/pages/MainPage.js
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import Sidebar from "../components/Sidebar";
 import MyPage from "./MyPage";
 import GroupPage from "./GroupPage";
 import GroupRecordsPage from "./GroupRecordsPage";
 import RecordDetailsPage from "./RecordDetailsPage";
 import LoginPage from "./LoginPage";
-import { AuthContext } from "../contexts/AuthContext";
 
 const MainPage = () => {
-  const { state } = useContext(AuthContext);
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const [activePage, setActivePage] = useState("home");
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedRecordId, setSelectedRecordId] = useState(null);
 
   const renderPage = () => {
+    if (!isAuthenticated && activePage !== "home") {
+      return <LoginPage />;
+    }
+
     switch (activePage) {
       case "mypage":
         return <MyPage />;
       case "home":
-        return <h1 className="text-2xl font-bold">Home Page</h1>;
+        return (
+          <div>
+            <h1 className="text-2xl font-bold">Home Page</h1>
+            {!isAuthenticated && (
+              <button
+                onClick={() => setActivePage("login")}
+                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                Login
+              </button>
+            )}
+          </div>
+        );
       case "groups":
         return (
           <GroupPage
@@ -49,14 +65,12 @@ const MainPage = () => {
         );
       case "settings":
         return <h1 className="text-2xl font-bold">Settings Page</h1>;
+      case "login":
+        return <LoginPage />;
       default:
         return <h1 className="text-2xl font-bold">Home Page</h1>;
     }
   };
-
-  if (!state.isAuthenticated) {
-    return <LoginPage />;
-  }
 
   return (
     <div className="flex">

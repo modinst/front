@@ -1,18 +1,34 @@
 // src/pages/LoginPage.js
-import React, { useState, useContext } from "react";
-import { AuthContext } from "../contexts/AuthContext";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { login } from "../store";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { dispatch } = useContext(AuthContext);
+  const dispatch = useDispatch();
 
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
-    if (username === "user" && password === "password") {
-      dispatch({ type: "LOGIN", payload: { username } });
-    } else {
-      alert("Invalid credentials");
+
+    try {
+      const response = await fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        dispatch(login({ username: data.username }));
+      } else {
+        alert("Invalid credentials");
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+      alert("An error occurred. Please try again.");
     }
   };
 

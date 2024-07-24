@@ -1,18 +1,19 @@
 // src/App.js
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
+import { Provider } from "react-redux";
+import store from "./store";
 import MainPage from "./pages/MainPage";
 
 const App = () => {
   return (
-    <AuthProvider>
+    <Provider store={store}>
       <Router>
         <Switch>
           <Route path="/" component={MainPage} />
         </Switch>
       </Router>
-    </AuthProvider>
+    </Provider>
   );
 };
 
