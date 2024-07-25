@@ -15,7 +15,6 @@ const RecordDetailsPage = ({ recordId }) => {
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [selectedInstrument, setSelectedInstrument] = useState("");
   const [selectedBpm, setSelectedBpm] = useState("90");
-  const [recordDuration, setRecordDuration] = useState("1:31");
   const [tempTracks, setTempTracks] = useState([]);
   const userId = useSelector((state) => state.auth.user?.id); // Redux Store에서 userId 가져오기
 
@@ -74,7 +73,6 @@ const RecordDetailsPage = ({ recordId }) => {
 
   const handleRecordComplete = () => {
     setIsMetronomeModalOpen(false);
-    setRecordDuration("1:31");
     setIsSaveModalOpen(true);
   };
 
@@ -90,7 +88,6 @@ const RecordDetailsPage = ({ recordId }) => {
       _id: new Date().getTime(),
       title: track.projectName,
       bpm: `${track.bpm} BPM`,
-      duration: track.duration,
       icon: `/path/to/${track.instrument.toLowerCase()}-icon.png`,
       instrument: track.instrument,
     };
@@ -223,7 +220,6 @@ const RecordDetailsPage = ({ recordId }) => {
         onClose={() => setIsSaveModalOpen(false)}
         instrument={selectedInstrument}
         bpm={record.bpm}
-        duration={recordDuration}
         onSave={handleSave}
         userId={userId}
         recordId={record._id}
@@ -240,7 +236,7 @@ const RecordDetailsPage = ({ recordId }) => {
                 <div>
                   <div className="text-lg font-semibold">{track.title}</div>
                   <div className="text-sm text-gray-500">
-                    {track.instrument} - {track.bpm} BPM - {track.duration}
+                    {track.instrument} - {track.bpm} BPM
                   </div>
                 </div>
                 <div className="flex space-x-2">

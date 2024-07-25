@@ -1,6 +1,6 @@
 import React from "react";
 
-const Track = ({ title, bpm, duration, icon, onClick }) => {
+const Track = ({ title, bpm, icon, onClick }) => {
   return (
     <div
       className={`flex justify-between items-center p-4 border border-gray-300 rounded-lg mb-4 ${
@@ -13,7 +13,6 @@ const Track = ({ title, bpm, duration, icon, onClick }) => {
         <div>
           <h3 className="text-lg font-semibold">{title}</h3>
           <p className="text-gray-600">{bpm}</p>
-          <p className="text-gray-600">{duration}</p>
         </div>
       </div>
     </div>
