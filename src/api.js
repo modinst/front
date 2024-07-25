@@ -38,15 +38,34 @@ export const createGroup = (name, description, image) =>
 export const requestJoinGroup = (groupId) =>
   apiClient.post(`/groups/${groupId}/join-requests`);
 
-// 특정 그룹의 멤버들을 가져오는 함수 추가
 export const getGroupMembers = (groupId) =>
   apiClient.get(`/groups/${groupId}/members`);
 
-// 특정 유저의 트랙들을 가져오는 함수
-export const getUserTracks = async (userId) => {
-  return apiClient.get(`/users/${userId}/tracks`);
-};
+export const getJoinRequests = (groupId) =>
+  apiClient.get(`/groups/${groupId}/join-requests`);
 
-export const saveTrack = async (userId, trackData) => {
-  return apiClient.post(`/users/${userId}/tracks`, trackData);
-};
+export const updateJoinRequestStatus = (groupId, requestId, status) =>
+  apiClient.patch(`/groups/${groupId}/join-requests/${requestId}`, {
+    request_status: status,
+  });
+
+export const getRecord = (recordId) => apiClient.get(`/records/${recordId}`);
+
+export const registerTrackToRecord = (recordId, trackId) =>
+  apiClient.post(`/records/${recordId}/tracks`, { trackId });
+
+export const getAllTracks = () => apiClient.get("/tracks");
+
+export const getInstruments = () => apiClient.get("/instruments");
+
+export const getAllUploads = () => apiClient.get("/uploads");
+
+export const getUpload = (filename) => apiClient.get(`/uploads/${filename}`);
+
+export const uploadFile = (formData) => apiClient.post("/upload", formData);
+
+export const getUserTracks = (userId) =>
+  apiClient.get(`/users/${userId}/tracks`);
+
+export const saveTrack = (userId, trackData) =>
+  apiClient.post(`/users/${userId}/tracks`, trackData);
