@@ -49,6 +49,9 @@ export const updateJoinRequestStatus = (groupId, requestId, status) =>
     request_status: status,
   });
 
+export const getGroupRecords = (groupId) =>
+  apiClient.get(`/groups/${groupId}/records`); // 그룹 레코드 조회 함수 추가
+
 export const getRecord = (recordId) => apiClient.get(`/records/${recordId}`);
 
 export const registerTrackToRecord = (recordId, trackId) =>
