@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector } from "react-redux"; // Redux 훅 임포트
 import { useHistory } from "react-router-dom";
 import GroupRequestModal from "../components/GroupRequestModal";
 import GroupCreateModal from "../components/GroupCreateModal";
@@ -18,7 +18,11 @@ const GroupPage = ({ onGroupClick }) => {
     const fetchGroups = async () => {
       try {
         const response = await getGroups();
-        setGroups(response.data);
+        const groupsData = response.data.map((group) => ({
+          ...group,
+          members: group.members || [], // 멤버가 없으면 빈 배열로 초기화
+        }));
+        setGroups(groupsData);
       } catch (error) {
         console.error("Failed to fetch groups", error);
       }
@@ -28,6 +32,11 @@ const GroupPage = ({ onGroupClick }) => {
   }, []);
 
   const handleRequestJoinClick = async (group) => {
+    if (!group || !group.id) {
+      console.error("Group or group.id is undefined", group);
+      return;
+    }
+
     setSelectedGroup(group);
     setIsRequestModalOpen(true);
 
