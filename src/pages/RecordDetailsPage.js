@@ -3,7 +3,6 @@ import TrackSelectionModal from "../components/TrackSelectionModal";
 import SelectModal from "../components/SelectModal";
 import MetronomeModal from "../components/MetronomeModal";
 import SaveModal from "../components/SaveModal";
-import Track from "../components/Track";
 import { getRecord, registerTrackToRecord } from "../api";
 import { useSelector } from "react-redux"; // Redux Store와 연결
 
@@ -24,11 +23,12 @@ const RecordDetailsPage = ({ recordId }) => {
     const fetchRecordData = async () => {
       try {
         const response = await getRecord(recordId);
-        const recordData = response.data;
-        if (!recordData.tracks) {
-          recordData.tracks = [];
+        const { record, tracks } = response.data;
+        console.log("Fetched record data:", record, tracks); // 콘솔 로그 추가
+        if (!record.tracks) {
+          record.tracks = tracks || [];
         }
-        setRecord(recordData);
+        setRecord(record);
       } catch (error) {
         console.error("Failed to fetch record data", error);
       }
@@ -102,6 +102,10 @@ const RecordDetailsPage = ({ recordId }) => {
 
   const handleUploadTrack = async (track) => {
     try {
+      if (!record || !record._id) {
+        console.error("Record ID is not defined.");
+        return;
+      }
       const existingTrack = record.tracks.find((t) => t._id === track._id);
       if (existingTrack) {
         console.error("Track already registered to this record.");
@@ -126,13 +130,15 @@ const RecordDetailsPage = ({ recordId }) => {
     return <h1 className="text-2xl font-bold">Loading...</h1>;
   }
 
+  console.log("Record state:", record); // 콘솔 로그 추가
+
   return (
     <div className="relative w-full h-[1070px] bg-[#fff] overflow-hidden p-4">
       <div className="absolute left-[0.69%] right-[-0.76%] top-0 bottom-0"></div>
       <div className="absolute left-[132px] top-[150px] w-[1217px] flex">
         <div className="w-3/4">
           <h1 className="text-[32px] tracking-[-0em] font-['Nunito_Sans'] font-bold text-[#202224]">
-            {record.title}
+            {record.title || "Untitled Record"}
           </h1>
           <div className="mt-4 space-y-4">
             {record.tracks.map((track) => (
@@ -193,9 +199,9 @@ const RecordDetailsPage = ({ recordId }) => {
       <TrackSelectionModal
         isOpen={isTrackModalOpen}
         onClose={handleCloseTrackModal}
-        onTrackSelect={handleTrackSelect} // 기존 트랙 선택
-        onAddNewTrack={handleAddNewTrack} // 새로운 트랙 추가
-        userId={userId} // userId 전달
+        onTrackSelect={handleTrackSelect}
+        onAddNewTrack={handleAddNewTrack}
+        userId={userId}
       />
       <SelectModal
         isOpen={isSelectModalOpen}
@@ -203,7 +209,7 @@ const RecordDetailsPage = ({ recordId }) => {
         onInstrumentSelect={setSelectedInstrument}
         bpm={record.bpm}
         onSubmit={handleSelectModalSubmit}
-        isBpmEditable={false} // BPM 변경 불가
+        isBpmEditable={false}
       />
       <MetronomeModal
         isOpen={isMetronomeModalOpen}
@@ -219,7 +225,8 @@ const RecordDetailsPage = ({ recordId }) => {
         bpm={record.bpm}
         duration={recordDuration}
         onSave={handleSave}
-        userId={userId} // userId 전달
+        userId={userId}
+        recordId={record._id}
       />
       {tempTracks.length > 0 && (
         <div className="fixed bottom-8 left-8 p-4 bg-white rounded-lg shadow-lg max-w-md w-full z-50">
