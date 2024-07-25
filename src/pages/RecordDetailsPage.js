@@ -5,6 +5,7 @@ import MetronomeModal from "../components/MetronomeModal";
 import SaveModal from "../components/SaveModal";
 import { getRecord, registerTrackToRecord } from "../api";
 import { useSelector } from "react-redux"; // Redux Store와 연결
+import { getIconByInstrument } from "../components/Track"; // 함수 임포트
 
 const RecordDetailsPage = ({ recordId }) => {
   const [record, setRecord] = useState(null);
@@ -88,7 +89,7 @@ const RecordDetailsPage = ({ recordId }) => {
       _id: new Date().getTime(),
       title: track.projectName,
       bpm: `${track.bpm} BPM`,
-      icon: `/path/to/${track.instrument.toLowerCase()}-icon.png`,
+      icon: getIconByInstrument(track.instrument), // 아이콘 경로를 함수로 설정
       instrument: track.instrument,
     };
     const savedTrack = saveTrackToLocalStorage(newTrack);
