@@ -70,6 +70,7 @@ const GroupPage = ({ onGroupClick }) => {
     try {
       const response = await getGroupRecords(group._id); // 그룹 레코드 조회
       const records = response.data;
+      console.log("Fetched records:", records); // 디버깅 로그 추가
 
       // 그룹 레코드 페이지로 이동하며 조회된 레코드를 전달
       onGroupClick(group, records);
@@ -99,7 +100,7 @@ const GroupPage = ({ onGroupClick }) => {
               alt="Group"
               className="w-full h-40 object-cover mb-4 rounded"
             />
-            <h2 className="text-xl font-bold mb-2">{group.name}</h2>
+            <h2 className="text-xl font-bold mb-2">{group.group_name}</h2>
             <p className="text-gray-600 mb-4">{group.description}</p>
             <button
               className="bg-gray-200 text-gray-700 px-4 py-2 rounded"
