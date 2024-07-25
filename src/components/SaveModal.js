@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { saveTrack } from "../api";
 import { useSelector } from "react-redux"; // Redux Store와 연결
 
-const SaveModal = ({ isOpen, onClose, instrument, bpm, duration, onSave }) => {
+const SaveModal = ({ isOpen, onClose, instrument, bpm, onSave }) => {
   const [projectName, setProjectName] = useState("");
   const userId = useSelector((state) => state.auth.user?.id); // Redux Store에서 userId 가져오기
 
@@ -15,7 +15,7 @@ const SaveModal = ({ isOpen, onClose, instrument, bpm, duration, onSave }) => {
       console.error("User ID is undefined");
       return;
     }
-    const track = { title: projectName, instrument, bpm, duration, isPublic };
+    const track = { title: projectName, instrument, bpm, isPublic };
     console.log("Saving track:", track);
     try {
       const response = await saveTrack(userId, track);
@@ -35,7 +35,6 @@ const SaveModal = ({ isOpen, onClose, instrument, bpm, duration, onSave }) => {
         <div className="flex justify-around mb-4">
           <div className="bg-gray-200 p-2 rounded">{instrument}</div>
           <div className="bg-gray-200 p-2 rounded">{bpm} BPM</div>
-          <div className="bg-gray-200 p-2 rounded">{duration}</div>
         </div>
         <input
           type="text"

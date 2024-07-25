@@ -14,7 +14,6 @@ const MyPage = () => {
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [selectedInstrument, setSelectedInstrument] = useState("");
   const [selectedBpm, setSelectedBpm] = useState("90");
-  const [recordDuration, setRecordDuration] = useState("1:31");
 
   const user = useSelector((state) => state.auth.user);
 
@@ -47,7 +46,6 @@ const MyPage = () => {
 
   const handleRecordComplete = () => {
     setIsMetronomeModalOpen(false);
-    setRecordDuration("1:31");
     setIsSaveModalOpen(true);
   };
 
@@ -61,7 +59,6 @@ const MyPage = () => {
     const trackData = {
       title: track.projectName,
       bpm: track.bpm,
-      duration: track.duration,
       instrument: track.instrument,
       isPublic: track.isPublic,
       track_path: `/path/to/${track.instrument.toLowerCase()}-icon.png`, // Assuming 'track_path' is the path to the track
@@ -91,7 +88,6 @@ const MyPage = () => {
           key={track._id}
           title={track.title}
           bpm={`${track.bpm} BPM`}
-          duration={track.duration}
           icon={track.icon}
         />
       ))}
@@ -115,7 +111,6 @@ const MyPage = () => {
         onClose={() => setIsSaveModalOpen(false)}
         instrument={selectedInstrument}
         bpm={selectedBpm}
-        duration={recordDuration}
         onSave={handleSave}
       />
     </div>

@@ -40,7 +40,6 @@ const TrackSelectionModal = ({
               key={track._id}
               title={track.title}
               bpm={track.bpm}
-              duration={track.duration}
               icon={track.icon}
               onClick={() => onTrackSelect(track)}
             />
