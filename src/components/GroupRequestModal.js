@@ -11,10 +11,10 @@ const GroupRequestModal = ({ isOpen, onClose, group }) => {
 
     try {
       // 디버깅 정보를 추가하여 group.id를 확인합니다.
-      console.log("Request join for group:", group.id);
+      console.log("Request join for group:", group._id);
 
       // 서버 요청 로직을 추가합니다.
-      await requestJoinGroup(group.id);
+      await requestJoinGroup(group._id);
 
       alert("Join request sent!");
       onClose();

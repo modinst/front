@@ -32,20 +32,15 @@ const GroupPage = ({ onGroupClick }) => {
   }, []);
 
   const handleRequestJoinClick = async (group) => {
-    if (!group || !group.id) {
-      console.error("Group or group.id is undefined", group);
-      return;
-    }
+    // console.log("handleRequestJoinClick called with group:", group); // 디버깅 로그 추가
+
+    // if (!group || !group.id) {
+    //   console.error("Group or group.id is undefined", group);
+    //   return;
+    // }
 
     setSelectedGroup(group);
     setIsRequestModalOpen(true);
-
-    try {
-      await requestJoinGroup(group.id);
-      alert("Join request sent!");
-    } catch (error) {
-      console.error("Failed to send join request", error);
-    }
   };
 
   const handleCreateGroup = async (newGroup) => {
