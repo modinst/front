@@ -1,5 +1,5 @@
-// src/components/GroupRequestModal.js
 import React, { useState } from "react";
+import { requestJoinGroup } from "../api"; // API 모듈에서 requestJoinGroup 함수 임포트
 
 const GroupRequestModal = ({ isOpen, onClose, group }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -10,10 +10,13 @@ const GroupRequestModal = ({ isOpen, onClose, group }) => {
     setError(null);
 
     try {
-      // 서버 요청 로직은 나중에 추가
-      // 예: const response = await fetch('/api/groups/join', {...});
+      // 디버깅 정보를 추가하여 group.id를 확인합니다.
       console.log("Request join for group:", group.id);
-      alert("Join request simulated!");
+
+      // 서버 요청 로직을 추가합니다.
+      await requestJoinGroup(group.id);
+
+      alert("Join request sent!");
       onClose();
     } catch (err) {
       setError("Failed to send join request");
@@ -29,11 +32,15 @@ const GroupRequestModal = ({ isOpen, onClose, group }) => {
       <div className="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto p-4">
         <h2 className="text-2xl font-bold mb-4">{group.name}</h2>
         <div className="mb-4">
-          {group.members.map((member, index) => (
-            <div key={index} className="bg-gray-200 p-2 rounded mb-2">
-              {member}
-            </div>
-          ))}
+          {group.members && group.members.length > 0 ? (
+            group.members.map((member, index) => (
+              <div key={index} className="bg-gray-200 p-2 rounded mb-2">
+                {member.username}
+              </div>
+            ))
+          ) : (
+            <div className="bg-gray-200 p-2 rounded mb-2">No members found</div>
+          )}
         </div>
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded mb-4"

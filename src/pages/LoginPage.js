@@ -13,12 +13,19 @@ const LoginPage = ({ onLoginSuccess }) => {
     event.preventDefault();
 
     try {
-      const { data } = await login(email, password);
-      dispatch(loginAction({ email: data.email, username: data.username }));
+      const response = await login(email, password);
+      console.log("Login response:", response.data); // 로그인 응답 로그
+      dispatch(
+        loginAction({
+          email: response.data.user.email,
+          username: response.data.user.username,
+          id: response.data.user.id,
+        })
+      );
       onLoginSuccess();
     } catch (error) {
-      console.error("Error logging in:", error);
-      alert("Login failed: " + error.response.data.message);
+      console.error("Login failed:", error);
+      alert("Invalid credentials");
     }
   };
 

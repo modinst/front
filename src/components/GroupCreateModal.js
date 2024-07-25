@@ -20,7 +20,7 @@ const GroupCreateModal = ({ isOpen, onClose, onCreate }) => {
 
   const handleSubmit = () => {
     if (groupName && description) {
-      onCreate({ groupName, description, groupPicture });
+      onCreate({ name: groupName, description, image: groupPicture });
       onClose();
     } else {
       alert("Please fill in all fields");

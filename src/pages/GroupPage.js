@@ -1,54 +1,69 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux"; // Redux 훅 임포트
 import { useHistory } from "react-router-dom";
 import GroupRequestModal from "../components/GroupRequestModal";
 import GroupCreateModal from "../components/GroupCreateModal";
+import { getGroups, createGroup, requestJoinGroup } from "../api";
 
 const GroupPage = ({ onGroupClick }) => {
   const history = useHistory();
+  const user = useSelector((state) => state.auth.user); // Redux 상태에서 사용자 정보 가져오기
   const defaultGroupImage = "path/to/default/image.png"; // 기본 이미지 경로 설정
-  const [groups, setGroups] = useState([
-    {
-      id: 1,
-      name: "Jason's Group",
-      description: "description~~...",
-      image: "image.png",
-      members: ["name1", "name2", "name3", "name4"],
-    },
-    {
-      id: 2,
-      name: "Duane Dean",
-      description: "description~~...",
-      image: "image-2.png",
-      members: ["name5", "name6", "name7", "name8"],
-    },
-    {
-      id: 3,
-      name: "Jonathan Barker",
-      description: "description~~...",
-      image: "image-3.png",
-      members: ["name9", "name10", "name11", "name12"],
-    },
-  ]);
-
+  const [groups, setGroups] = useState([]);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
 
-  const handleRequestJoinClick = (group) => {
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const response = await getGroups();
+        const groupsData = response.data.map((group) => ({
+          ...group,
+          members: group.members || [], // 멤버가 없으면 빈 배열로 초기화
+        }));
+        setGroups(groupsData);
+      } catch (error) {
+        console.error("Failed to fetch groups", error);
+      }
+    };
+
+    fetchGroups();
+  }, []);
+
+  const handleRequestJoinClick = async (group) => {
+    if (!group || !group.id) {
+      console.error("Group or group.id is undefined", group);
+      return;
+    }
+
     setSelectedGroup(group);
     setIsRequestModalOpen(true);
+
+    try {
+      await requestJoinGroup(group.id);
+      alert("Join request sent!");
+    } catch (error) {
+      console.error("Failed to send join request", error);
+    }
   };
 
-  const handleCreateGroup = (newGroup) => {
-    const newGroupId = groups.length + 1;
-    const groupWithId = {
-      id: newGroupId,
-      name: newGroup.groupName,
-      description: newGroup.description,
-      image: newGroup.groupPicture || defaultGroupImage,
-      members: [],
-    };
-    setGroups([...groups, groupWithId]);
+  const handleCreateGroup = async (newGroup) => {
+    try {
+      const response = await createGroup(
+        newGroup.name,
+        newGroup.description,
+        newGroup.image
+      );
+      const newGroupWithMembers = {
+        ...response.data,
+        members: [{ username: user.username }], // 그룹 리더를 멤버로 추가
+      };
+      setGroups([...groups, newGroupWithMembers]);
+      setIsCreateModalOpen(false);
+    } catch (error) {
+      console.error("Failed to create group", error);
+    }
   };
 
   const handleGroupClick = (group) => {
@@ -71,12 +86,12 @@ const GroupPage = ({ onGroupClick }) => {
       <div className="grid grid-cols-3 gap-4">
         {groups.map((group) => (
           <div
-            key={group.id}
+            key={group.id} // 각 그룹에 고유한 키 추가
             className="bg-white rounded-lg shadow-md p-4 cursor-pointer"
             onClick={() => handleGroupClick(group)}
           >
             <img
-              src={group.image}
+              src={group.image || defaultGroupImage}
               alt="Group"
               className="w-full h-40 object-cover mb-4 rounded"
             />

@@ -1,9 +1,11 @@
 // src/pages/MyPage.js
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import Track from "../components/Track";
 import SelectModal from "../components/SelectModal";
 import MetronomeModal from "../components/MetronomeModal";
 import SaveModal from "../components/SaveModal";
+import { getUserTracks, saveTrack } from "../api";
 
 const MyPage = () => {
   const [tracks, setTracks] = useState([]);
@@ -14,36 +16,28 @@ const MyPage = () => {
   const [selectedBpm, setSelectedBpm] = useState("90");
   const [recordDuration, setRecordDuration] = useState("1:31");
 
+  const user = useSelector((state) => state.auth.user);
+
   useEffect(() => {
+    console.log("User:", user); // 유저 정보 로그
     const fetchTracks = async () => {
-      const fetchedTracks = [
-        {
-          id: 1,
-          title: "My new Guitar Track #1",
-          bpm: "90 BPM",
-          duration: "3:11",
-          icon: "/path/to/guitar-icon.png",
-        },
-        {
-          id: 2,
-          title: "My new Drum Track #1",
-          bpm: "105 BPM",
-          duration: "2:01",
-          icon: "/path/to/drum-icon.png",
-        },
-        {
-          id: 3,
-          title: "My new Guitar Track #2",
-          bpm: "90 BPM",
-          duration: "3:31",
-          icon: "/path/to/guitar-icon.png",
-        },
-      ];
-      setTracks(fetchedTracks);
+      if (!user || !user.id) {
+        console.error("User is not defined");
+        return;
+      }
+
+      try {
+        const response = await getUserTracks(user.id);
+        setTracks(response.data);
+      } catch (error) {
+        console.error("Failed to fetch tracks", error);
+      }
     };
 
-    fetchTracks();
-  }, []);
+    if (user && user.id) {
+      fetchTracks();
+    }
+  }, [user]);
 
   const handleSelectModalSubmit = (newBpm) => {
     setSelectedBpm(newBpm);
@@ -57,17 +51,29 @@ const MyPage = () => {
     setIsSaveModalOpen(true);
   };
 
-  const handleSave = (track) => {
-    setTracks([
-      ...tracks,
-      {
-        id: tracks.length + 1,
-        title: track.projectName,
-        bpm: `${track.bpm} BPM`,
-        duration: track.duration,
-        icon: `/path/to/${track.instrument.toLowerCase()}-icon.png`,
-      },
-    ]);
+  const handleSave = async (track) => {
+    console.log("Saving track:", track); // 트랙 저장 정보 로그
+    if (!user || !user.id) {
+      console.error("User is not defined");
+      return;
+    }
+
+    const trackData = {
+      title: track.projectName,
+      bpm: track.bpm,
+      duration: track.duration,
+      instrument: track.instrument,
+      isPublic: track.isPublic,
+      track_path: `/path/to/${track.instrument.toLowerCase()}-icon.png`, // Assuming 'track_path' is the path to the track
+    };
+
+    try {
+      const response = await saveTrack(user.id, trackData);
+      setTracks([...tracks, response.data]);
+    } catch (error) {
+      console.error("Failed to save track", error);
+    }
+
     setIsSaveModalOpen(false);
   };
 
@@ -82,9 +88,9 @@ const MyPage = () => {
       </button>
       {tracks.map((track) => (
         <Track
-          key={track.id}
+          key={track._id}
           title={track.title}
-          bpm={track.bpm}
+          bpm={`${track.bpm} BPM`}
           duration={track.duration}
           icon={track.icon}
         />

@@ -14,6 +14,7 @@ import RegisterPage from "./RegisterPage";
 
 const MainPage = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const [activePage, setActivePage] = useState("home");
   const [selectedGroup, setSelectedGroup] = useState(null);
@@ -23,19 +24,22 @@ const MainPage = () => {
     const checkUserSession = async () => {
       try {
         const { data } = await checkSession();
+        console.log("Session data:", data); // 세션 데이터 로그
         if (data.user) {
           dispatch(
             loginAction({
               email: data.user.email,
               username: data.user.username,
+              id: data.user.id,
             })
           );
         } else {
-          dispatch(logoutAction()); // 세션이 없을 경우 로그아웃 상태로 설정
+          dispatch(logoutAction());
         }
       } catch (error) {
         console.error("Failed to check session", error);
-        dispatch(logoutAction()); // 세션 확인 실패 시 로그아웃 상태로 설정
+        dispatch(logoutAction());
+        setActivePage("login"); // 세션 확인 실패 시 로그인 페이지로 이동
       }
     };
 
