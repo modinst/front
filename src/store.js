@@ -1,4 +1,3 @@
-// src/store.js
 import { configureStore, createSlice } from "@reduxjs/toolkit";
 
 const authSlice = createSlice({
@@ -28,3 +27,4 @@ const store = configureStore({
 });
 
 export default store;
+export { store }; // 추가 내보내기
