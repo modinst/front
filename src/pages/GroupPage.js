@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
 import GroupRequestModal from "../components/GroupRequestModal";
 import GroupCreateModal from "../components/GroupCreateModal";
 import { getGroups, createGroup, getGroupRecords } from "../api"; // getGroupRecords 함수 추가
 
 const GroupPage = ({ onGroupClick }) => {
-  const history = useHistory();
   const user = useSelector((state) => state.auth.user);
   const defaultGroupImage = "path/to/default/image.png"; // 기본 이미지 경로 설정
   const [groups, setGroups] = useState([]);
