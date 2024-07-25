@@ -1,13 +1,33 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Track from "./Track";
+import { getUserTracks } from "../api"; // getUserTracks API 함수 임포트
+import { useSelector } from "react-redux"; // Redux Store와 연결
 
 const TrackSelectionModal = ({
   isOpen,
   onClose,
-  tracks,
   onTrackSelect,
   onAddNewTrack,
+  userId,
 }) => {
+  const [tracks, setTracks] = useState([]);
+  const storeUserId = useSelector((state) => state.auth.user?.id);
+
+  useEffect(() => {
+    const fetchTracks = async () => {
+      if (isOpen && userId) {
+        try {
+          const response = await getUserTracks(userId || storeUserId);
+          setTracks(response.data);
+        } catch (error) {
+          console.error("Failed to fetch tracks", error);
+        }
+      }
+    };
+
+    fetchTracks();
+  }, [isOpen, userId, storeUserId]);
+
   if (!isOpen) return null;
 
   return (
@@ -17,7 +37,7 @@ const TrackSelectionModal = ({
         <div className="space-y-4">
           {tracks.map((track) => (
             <Track
-              key={track.id}
+              key={track._id}
               title={track.title}
               bpm={track.bpm}
               duration={track.duration}

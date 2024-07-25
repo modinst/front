@@ -4,7 +4,8 @@ import SelectModal from "../components/SelectModal";
 import MetronomeModal from "../components/MetronomeModal";
 import SaveModal from "../components/SaveModal";
 import Track from "../components/Track";
-import { getRecord, registerTrackToRecord } from "../api"; // 추가된 API 함수 임포트
+import { getRecord, registerTrackToRecord } from "../api";
+import { useSelector } from "react-redux"; // Redux Store와 연결
 
 const RecordDetailsPage = ({ recordId }) => {
   const [record, setRecord] = useState(null);
@@ -17,13 +18,13 @@ const RecordDetailsPage = ({ recordId }) => {
   const [selectedBpm, setSelectedBpm] = useState("90");
   const [recordDuration, setRecordDuration] = useState("1:31");
   const [tempTracks, setTempTracks] = useState([]);
+  const userId = useSelector((state) => state.auth.user?.id); // Redux Store에서 userId 가져오기
 
   useEffect(() => {
     const fetchRecordData = async () => {
       try {
         const response = await getRecord(recordId);
         const recordData = response.data;
-        // tracks가 undefined일 경우 빈 배열로 설정
         if (!recordData.tracks) {
           recordData.tracks = [];
         }
@@ -52,16 +53,8 @@ const RecordDetailsPage = ({ recordId }) => {
     setIsTrackModalOpen(false);
   };
 
-  const handleTrackSelect = async (track) => {
-    try {
-      await registerTrackToRecord(record._id, track._id);
-      setRecord((prevRecord) => ({
-        ...prevRecord,
-        tracks: [...prevRecord.tracks, track],
-      }));
-    } catch (error) {
-      console.error("Failed to register track to record", error);
-    }
+  const handleTrackSelect = (track) => {
+    setTempTracks([...tempTracks, track]);
     setIsTrackModalOpen(false);
   };
 
@@ -94,7 +87,7 @@ const RecordDetailsPage = ({ recordId }) => {
 
   const handleSave = (track) => {
     const newTrack = {
-      id: new Date().getTime(),
+      _id: new Date().getTime(),
       title: track.projectName,
       bpm: `${track.bpm} BPM`,
       duration: track.duration,
@@ -107,15 +100,25 @@ const RecordDetailsPage = ({ recordId }) => {
     setIsSaveModalOpen(false);
   };
 
-  const handleUploadTrack = (track) => {
-    const updatedRecordTracks = [...record.tracks, track];
-    setRecord({ ...record, tracks: updatedRecordTracks });
-    const updatedTempTracks = tempTracks.filter((t) => t.id !== track.id);
-    setTempTracks(updatedTempTracks);
+  const handleUploadTrack = async (track) => {
+    try {
+      const existingTrack = record.tracks.find((t) => t._id === track._id);
+      if (existingTrack) {
+        console.error("Track already registered to this record.");
+        return;
+      }
+      await registerTrackToRecord(record._id, track._id);
+      const updatedRecordTracks = [...record.tracks, track];
+      setRecord({ ...record, tracks: updatedRecordTracks });
+      const updatedTempTracks = tempTracks.filter((t) => t._id !== track._id);
+      setTempTracks(updatedTempTracks);
+    } catch (error) {
+      console.error("Failed to upload track to record", error);
+    }
   };
 
   const handleRemoveTempTrack = (track) => {
-    const updatedTempTracks = tempTracks.filter((t) => t.id !== track.id);
+    const updatedTempTracks = tempTracks.filter((t) => t._id !== track._id);
     setTempTracks(updatedTempTracks);
   };
 
@@ -190,9 +193,9 @@ const RecordDetailsPage = ({ recordId }) => {
       <TrackSelectionModal
         isOpen={isTrackModalOpen}
         onClose={handleCloseTrackModal}
-        tracks={record.tracks}
         onTrackSelect={handleTrackSelect} // 기존 트랙 선택
         onAddNewTrack={handleAddNewTrack} // 새로운 트랙 추가
+        userId={userId} // userId 전달
       />
       <SelectModal
         isOpen={isSelectModalOpen}
@@ -216,6 +219,7 @@ const RecordDetailsPage = ({ recordId }) => {
         bpm={record.bpm}
         duration={recordDuration}
         onSave={handleSave}
+        userId={userId} // userId 전달
       />
       {tempTracks.length > 0 && (
         <div className="fixed bottom-8 left-8 p-4 bg-white rounded-lg shadow-lg max-w-md w-full z-50">
@@ -223,7 +227,7 @@ const RecordDetailsPage = ({ recordId }) => {
           <div className="space-y-2">
             {tempTracks.map((track) => (
               <div
-                key={track.id}
+                key={track._id}
                 className="bg-gray-100 p-2 rounded-lg flex justify-between items-center"
               >
                 <div>
