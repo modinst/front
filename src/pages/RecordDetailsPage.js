@@ -1,12 +1,13 @@
-// src/pages/RecordDetailsPage.js
 import React, { useState, useEffect } from "react";
 import TrackSelectionModal from "../components/TrackSelectionModal";
 import SelectModal from "../components/SelectModal";
 import MetronomeModal from "../components/MetronomeModal";
 import SaveModal from "../components/SaveModal";
 import Track from "../components/Track";
+import { getRecord, registerTrackToRecord } from "../api";
+import { useSelector } from "react-redux"; // Redux Store와 연결
 
-const RecordDetailsPage = ({ userId }) => {
+const RecordDetailsPage = ({ recordId }) => {
   const [record, setRecord] = useState(null);
   const [selectedTracks, setSelectedTracks] = useState([]);
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
@@ -17,45 +18,24 @@ const RecordDetailsPage = ({ userId }) => {
   const [selectedBpm, setSelectedBpm] = useState("90");
   const [recordDuration, setRecordDuration] = useState("1:31");
   const [tempTracks, setTempTracks] = useState([]);
+  const userId = useSelector((state) => state.auth.user?.id); // Redux Store에서 userId 가져오기
 
   useEffect(() => {
     const fetchRecordData = async () => {
-      const recordData = {
-        id: 1,
-        name: `Record #1`,
-        bpm: 90,
-        tracks: [
-          {
-            id: 1,
-            title: "Guitar Track #1",
-            artist: "name1",
-            bpm: 90,
-            duration: "3:11",
-            icon: "path/to/icon1.png",
-          },
-          {
-            id: 2,
-            title: "Drum Track #1",
-            artist: "name2",
-            bpm: 90,
-            duration: "2:01",
-            icon: "path/to/icon2.png",
-          },
-          {
-            id: 3,
-            title: "Guitar Track #2",
-            artist: "name3",
-            bpm: 90,
-            duration: "3:31",
-            icon: "path/to/icon3.png",
-          },
-        ],
-      };
-      setRecord(recordData);
+      try {
+        const response = await getRecord(recordId);
+        const recordData = response.data;
+        if (!recordData.tracks) {
+          recordData.tracks = [];
+        }
+        setRecord(recordData);
+      } catch (error) {
+        console.error("Failed to fetch record data", error);
+      }
     };
 
     fetchRecordData();
-  }, []);
+  }, [recordId]);
 
   const toggleTrackSelection = (track) => {
     setSelectedTracks((prevSelectedTracks) =>
@@ -107,7 +87,7 @@ const RecordDetailsPage = ({ userId }) => {
 
   const handleSave = (track) => {
     const newTrack = {
-      id: new Date().getTime(),
+      _id: new Date().getTime(),
       title: track.projectName,
       bpm: `${track.bpm} BPM`,
       duration: track.duration,
@@ -120,15 +100,25 @@ const RecordDetailsPage = ({ userId }) => {
     setIsSaveModalOpen(false);
   };
 
-  const handleUploadTrack = (track) => {
-    const updatedRecordTracks = [...record.tracks, track];
-    setRecord({ ...record, tracks: updatedRecordTracks });
-    const updatedTempTracks = tempTracks.filter((t) => t.id !== track.id);
-    setTempTracks(updatedTempTracks);
+  const handleUploadTrack = async (track) => {
+    try {
+      const existingTrack = record.tracks.find((t) => t._id === track._id);
+      if (existingTrack) {
+        console.error("Track already registered to this record.");
+        return;
+      }
+      await registerTrackToRecord(record._id, track._id);
+      const updatedRecordTracks = [...record.tracks, track];
+      setRecord({ ...record, tracks: updatedRecordTracks });
+      const updatedTempTracks = tempTracks.filter((t) => t._id !== track._id);
+      setTempTracks(updatedTempTracks);
+    } catch (error) {
+      console.error("Failed to upload track to record", error);
+    }
   };
 
   const handleRemoveTempTrack = (track) => {
-    const updatedTempTracks = tempTracks.filter((t) => t.id !== track.id);
+    const updatedTempTracks = tempTracks.filter((t) => t._id !== track._id);
     setTempTracks(updatedTempTracks);
   };
 
@@ -142,12 +132,12 @@ const RecordDetailsPage = ({ userId }) => {
       <div className="absolute left-[132px] top-[150px] w-[1217px] flex">
         <div className="w-3/4">
           <h1 className="text-[32px] tracking-[-0em] font-['Nunito_Sans'] font-bold text-[#202224]">
-            Record #1
+            {record.title}
           </h1>
           <div className="mt-4 space-y-4">
             {record.tracks.map((track) => (
               <div
-                key={track.id}
+                key={track._id}
                 className="bg-[#fff] border-[1px] border-solid border-[#d5d5d5] rounded-[12px] p-4 flex justify-between items-center"
               >
                 <div className="text-[20px] font-['Nunito_Sans'] font-semibold text-[#000] flex-grow">
@@ -180,7 +170,7 @@ const RecordDetailsPage = ({ userId }) => {
             <div className="space-y-2">
               {selectedTracks.map((track) => (
                 <div
-                  key={track.id}
+                  key={track._id}
                   className="bg-gray-100 rounded-lg shadow-md p-2 flex justify-between items-center"
                 >
                   <div>{track.title}</div>
@@ -203,9 +193,9 @@ const RecordDetailsPage = ({ userId }) => {
       <TrackSelectionModal
         isOpen={isTrackModalOpen}
         onClose={handleCloseTrackModal}
-        tracks={record.tracks}
         onTrackSelect={handleTrackSelect} // 기존 트랙 선택
         onAddNewTrack={handleAddNewTrack} // 새로운 트랙 추가
+        userId={userId} // userId 전달
       />
       <SelectModal
         isOpen={isSelectModalOpen}
@@ -229,6 +219,7 @@ const RecordDetailsPage = ({ userId }) => {
         bpm={record.bpm}
         duration={recordDuration}
         onSave={handleSave}
+        userId={userId} // userId 전달
       />
       {tempTracks.length > 0 && (
         <div className="fixed bottom-8 left-8 p-4 bg-white rounded-lg shadow-lg max-w-md w-full z-50">
@@ -236,7 +227,7 @@ const RecordDetailsPage = ({ userId }) => {
           <div className="space-y-2">
             {tempTracks.map((track) => (
               <div
-                key={track.id}
+                key={track._id}
                 className="bg-gray-100 p-2 rounded-lg flex justify-between items-center"
               >
                 <div>

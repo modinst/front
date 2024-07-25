@@ -1,17 +1,28 @@
-// src/components/SaveModal.js
 import React, { useState, useEffect } from "react";
+import { saveTrack } from "../api";
+import { useSelector } from "react-redux"; // Redux Store와 연결
 
 const SaveModal = ({ isOpen, onClose, instrument, bpm, duration, onSave }) => {
   const [projectName, setProjectName] = useState("");
+  const userId = useSelector((state) => state.auth.user?.id); // Redux Store에서 userId 가져오기
 
   useEffect(() => {
     setProjectName(""); // 모달이 열릴 때마다 프로젝트 이름 초기화
   }, [isOpen]);
 
-  const handleSave = (isPublic) => {
-    const track = { projectName, instrument, bpm, duration, isPublic };
-    console.log("Saving track:", track); // 로그 추가
-    onSave(track);
+  const handleSave = async (isPublic) => {
+    if (!userId) {
+      console.error("User ID is undefined");
+      return;
+    }
+    const track = { title: projectName, instrument, bpm, duration, isPublic };
+    console.log("Saving track:", track);
+    try {
+      const response = await saveTrack(userId, track);
+      onSave(response.data);
+    } catch (error) {
+      console.error("Failed to save track", error);
+    }
     onClose();
   };
 

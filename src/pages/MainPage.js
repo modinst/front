@@ -1,4 +1,3 @@
-// src/pages/MainPage.js
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { login as loginAction, logout as logoutAction } from "../store";
@@ -19,6 +18,7 @@ const MainPage = () => {
   const [activePage, setActivePage] = useState("home");
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedRecordId, setSelectedRecordId] = useState(null);
+  const [groupRecords, setGroupRecords] = useState([]);
 
   useEffect(() => {
     const checkUserSession = async () => {
@@ -82,8 +82,9 @@ const MainPage = () => {
       case "groups":
         return (
           <GroupPage
-            onGroupClick={(group) => {
+            onGroupClick={(group, records) => {
               setSelectedGroup(group);
+              setGroupRecords(records);
               setActivePage("groupRecords");
             }}
           />
@@ -92,6 +93,7 @@ const MainPage = () => {
         return selectedGroup ? (
           <GroupRecordsPage
             group={selectedGroup}
+            records={groupRecords}
             onRecordClick={(recordId) => {
               setSelectedRecordId(recordId);
               setActivePage("recordDetails");

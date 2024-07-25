@@ -1,18 +1,19 @@
-// src/components/AddRecordModal.js
 import React, { useState } from "react";
+import { createRecord } from "../api"; // createRecord API 함수 임포트
 
-const AddRecordModal = ({ isOpen, onClose, onAddRecord }) => {
+const AddRecordModal = ({ isOpen, onClose, onAddRecord, groupId }) => {
   const [recordName, setRecordName] = useState("");
   const [recordBpm, setRecordBpm] = useState("90");
 
-  const handleSave = () => {
-    const newRecord = {
-      id: new Date().getTime(),
-      name: recordName,
-      bpm: recordBpm,
-    };
-    onAddRecord(newRecord);
-    onClose();
+  const handleSave = async () => {
+    try {
+      const newRecord = { title: recordName, bpm: recordBpm };
+      const response = await createRecord(groupId, newRecord);
+      onAddRecord(response.data);
+      onClose();
+    } catch (error) {
+      console.error("Failed to create record", error);
+    }
   };
 
   if (!isOpen) return null;

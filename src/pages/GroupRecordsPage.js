@@ -1,67 +1,86 @@
-// src/pages/GroupRecordsPage.js
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import AddRecordModal from "../components/AddRecordModal";
+import React, { useState } from "react";
+import { createRecord } from "../api"; // createRecord API 함수 임포트
 
-const GroupRecordsPage = ({ onRecordClick }) => {
-  const { groupId } = useParams(); // URL 파라미터에서 groupId를 가져옵니다.
-  const [records, setRecords] = useState([]);
-  const [isAddRecordModalOpen, setIsAddRecordModalOpen] = useState(false);
-  const [group, setGroup] = useState(null); // 그룹 데이터를 저장할 상태
+const GroupRecordsPage = ({ group, records, onRecordClick }) => {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newRecordTitle, setNewRecordTitle] = useState("");
+  const [newRecordBpm, setNewRecordBpm] = useState("");
 
-  useEffect(() => {
-    // 그룹 데이터 및 레코드 데이터를 가져오는 비동기 함수
-    const fetchGroupData = async () => {
-      // 여기서 실제 API 호출 또는 데이터베이스 쿼리를 수행해야 합니다.
-      const groupData = {
-        id: groupId,
-        name: `Group ${groupId}`,
-        description: `Description for group ${groupId}`,
-      };
-      setGroup(groupData);
-
-      const recordData = [
-        { id: 1, name: "Record #1", bpm: 90 },
-        { id: 2, name: "Record #2", bpm: 90 },
-        { id: 3, name: "Record #3", bpm: 90 },
-        { id: 4, name: "Record #4", bpm: 90 },
-      ];
-      setRecords(recordData);
-    };
-
-    fetchGroupData();
-  }, [groupId]); // groupId가 변경될 때마다 데이터를 다시 가져옵니다.
-
-  const handleAddRecord = (newRecord) => {
-    setRecords([...records, newRecord]);
+  const handleCreateRecord = async () => {
+    try {
+      const response = await createRecord(group._id, {
+        title: newRecordTitle,
+        bpm: newRecordBpm,
+      });
+      console.log("Created record:", response.data); // 디버깅 로그 추가
+      setIsCreateModalOpen(false);
+      // 필요한 경우, 상태를 업데이트하여 새로 생성된 레코드를 추가합니다.
+      // onRecordCreate(response.data);
+    } catch (error) {
+      console.error("Failed to create record", error);
+    }
   };
 
   return (
     <div className="p-4">
-      {group && <h1 className="text-2xl font-bold mb-4">{group.name}</h1>}
+      <h1 className="text-2xl font-bold mb-4">Group Records</h1>
       <button
         className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
-        onClick={() => setIsAddRecordModalOpen(true)}
+        onClick={() => setIsCreateModalOpen(true)}
       >
         + Add New Record
       </button>
-      <div className="space-y-4">
+      <div className="grid grid-cols-3 gap-4">
         {records.map((record) => (
           <div
-            key={record.id}
-            className="bg-white rounded-lg shadow-md p-4 flex justify-between items-center cursor-pointer"
-            onClick={() => onRecordClick(record.id)}
+            key={record.record_id._id}
+            className="bg-white rounded-lg shadow-md p-4 cursor-pointer"
+            onClick={() => onRecordClick(record.record_id._id)}
           >
-            <div>{record.name}</div>
-            <div>{record.bpm} BPM</div>
+            <h2 className="text-xl font-bold mb-2">{record.record_id.title}</h2>
+            <p className="text-gray-600 mb-4">BPM: {record.record_id.bpm}</p>
           </div>
         ))}
       </div>
-      <AddRecordModal
-        isOpen={isAddRecordModalOpen}
-        onClose={() => setIsAddRecordModalOpen(false)}
-        onAddRecord={handleAddRecord}
-      />
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto p-4">
+            <h2 className="text-2xl font-bold mb-4">Create New Record</h2>
+            <div className="mb-4">
+              <label className="block text-gray-700">Title</label>
+              <input
+                type="text"
+                className="w-full p-2 border border-gray-300 rounded mt-1"
+                value={newRecordTitle}
+                onChange={(e) => setNewRecordTitle(e.target.value)}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">BPM</label>
+              <input
+                type="number"
+                className="w-full p-2 border border-gray-300 rounded mt-1"
+                value={newRecordBpm}
+                onChange={(e) => setNewRecordBpm(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-end">
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
+                onClick={handleCreateRecord}
+              >
+                Create
+              </button>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded"
+                onClick={() => setIsCreateModalOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
