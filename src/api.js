@@ -38,6 +38,10 @@ export const createGroup = (name, description, image) =>
 export const requestJoinGroup = (groupId) =>
   apiClient.post(`/groups/${groupId}/join-requests`);
 
+// 특정 그룹의 멤버들을 가져오는 함수 추가
+export const getGroupMembers = (groupId) =>
+  apiClient.get(`/groups/${groupId}/members`);
+
 // 특정 유저의 트랙들을 가져오는 함수
 export const getUserTracks = async (userId) => {
   return apiClient.get(`/users/${userId}/tracks`);
