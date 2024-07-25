@@ -1,12 +1,12 @@
-// src/pages/RecordDetailsPage.js
 import React, { useState, useEffect } from "react";
 import TrackSelectionModal from "../components/TrackSelectionModal";
 import SelectModal from "../components/SelectModal";
 import MetronomeModal from "../components/MetronomeModal";
 import SaveModal from "../components/SaveModal";
 import Track from "../components/Track";
+import { getRecord, registerTrackToRecord } from "../api"; // 추가된 API 함수 임포트
 
-const RecordDetailsPage = ({ userId }) => {
+const RecordDetailsPage = ({ recordId }) => {
   const [record, setRecord] = useState(null);
   const [selectedTracks, setSelectedTracks] = useState([]);
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
@@ -20,42 +20,21 @@ const RecordDetailsPage = ({ userId }) => {
 
   useEffect(() => {
     const fetchRecordData = async () => {
-      const recordData = {
-        id: 1,
-        name: `Record #1`,
-        bpm: 90,
-        tracks: [
-          {
-            id: 1,
-            title: "Guitar Track #1",
-            artist: "name1",
-            bpm: 90,
-            duration: "3:11",
-            icon: "path/to/icon1.png",
-          },
-          {
-            id: 2,
-            title: "Drum Track #1",
-            artist: "name2",
-            bpm: 90,
-            duration: "2:01",
-            icon: "path/to/icon2.png",
-          },
-          {
-            id: 3,
-            title: "Guitar Track #2",
-            artist: "name3",
-            bpm: 90,
-            duration: "3:31",
-            icon: "path/to/icon3.png",
-          },
-        ],
-      };
-      setRecord(recordData);
+      try {
+        const response = await getRecord(recordId);
+        const recordData = response.data;
+        // tracks가 undefined일 경우 빈 배열로 설정
+        if (!recordData.tracks) {
+          recordData.tracks = [];
+        }
+        setRecord(recordData);
+      } catch (error) {
+        console.error("Failed to fetch record data", error);
+      }
     };
 
     fetchRecordData();
-  }, []);
+  }, [recordId]);
 
   const toggleTrackSelection = (track) => {
     setSelectedTracks((prevSelectedTracks) =>
@@ -73,8 +52,16 @@ const RecordDetailsPage = ({ userId }) => {
     setIsTrackModalOpen(false);
   };
 
-  const handleTrackSelect = (track) => {
-    setTempTracks([...tempTracks, track]);
+  const handleTrackSelect = async (track) => {
+    try {
+      await registerTrackToRecord(record._id, track._id);
+      setRecord((prevRecord) => ({
+        ...prevRecord,
+        tracks: [...prevRecord.tracks, track],
+      }));
+    } catch (error) {
+      console.error("Failed to register track to record", error);
+    }
     setIsTrackModalOpen(false);
   };
 
@@ -142,12 +129,12 @@ const RecordDetailsPage = ({ userId }) => {
       <div className="absolute left-[132px] top-[150px] w-[1217px] flex">
         <div className="w-3/4">
           <h1 className="text-[32px] tracking-[-0em] font-['Nunito_Sans'] font-bold text-[#202224]">
-            Record #1
+            {record.title}
           </h1>
           <div className="mt-4 space-y-4">
             {record.tracks.map((track) => (
               <div
-                key={track.id}
+                key={track._id}
                 className="bg-[#fff] border-[1px] border-solid border-[#d5d5d5] rounded-[12px] p-4 flex justify-between items-center"
               >
                 <div className="text-[20px] font-['Nunito_Sans'] font-semibold text-[#000] flex-grow">
@@ -180,7 +167,7 @@ const RecordDetailsPage = ({ userId }) => {
             <div className="space-y-2">
               {selectedTracks.map((track) => (
                 <div
-                  key={track.id}
+                  key={track._id}
                   className="bg-gray-100 rounded-lg shadow-md p-2 flex justify-between items-center"
                 >
                   <div>{track.title}</div>
